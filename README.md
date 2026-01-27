@@ -29,3 +29,9 @@ sudo docker compose up -d --build
 ```
 
 Virtual smart home UI: http://localhost:8080
+
+## Ollama + FunctionGemma
+
+- Ollama runs on `http://localhost:11434`.
+- The smart home tool proxy runs on `http://localhost:8090`.
+- Tool bridge endpoint: `POST /tools/smart_home` (see `ollama_proxy/README.md`).

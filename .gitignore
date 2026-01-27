@@ -28,3 +28,6 @@ coverage.txt
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Data
+ollama-data/

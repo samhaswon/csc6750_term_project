@@ -1,7 +1,32 @@
 services:
   vshome:
+    container_name: vshome
     build:
       context: ./vshome
     ports:
       - "8080:8080"
     restart: unless-stopped
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+  ollama_proxy:
+    container_name: ollama_proxy
+    build:
+      context: ./ollama_proxy
+    environment:
+      - VSHOME_URL=http://vshome:8080
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=gemma3n:e2b
+    ports:
+      - "8090:8090"
+    depends_on:
+      - vshome
+    restart: unless-stopped
+
+volumes:
+  ollama-data:

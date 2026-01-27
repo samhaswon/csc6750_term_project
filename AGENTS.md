@@ -19,6 +19,8 @@ Use Docker Compose from the repository root to run services:
 sudo docker compose up -d --build
 ```
 
+The Compose stack includes the virtual smart home UI, Ollama, and an Ollama tool proxy.
+
 ## Code Style
 
 When writing Python, follow PEP8 standards with a line length maximum of 100 characters. Python function docstrings should follow the reStructuredText style with field lists (i.e., `:param x: ...`), also being succinct and clear. Variable names should make clear what the variable is for without being too long. Don't use comments for code with a clear purpose and actions.
