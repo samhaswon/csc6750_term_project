@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virtual Smart Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Virtual Smart Home</p>
+        <h1>Control Center</h1>
+        <p class="subtitle">Live life smarter</p>
+      </div>
+      <div class="status">
+        <span class="dot" id="ws-dot"></span>
+        <span id="ws-status">Connecting</span>
+      </div>
+    </header>
+
+    <section class="grid" id="device-grid"></section>
+  </div>
+
+  <template id="device-card-template">
+    <article class="card">
+      <header>
+        <h2 class="device-name"></h2>
+        <p class="device-room"></p>
+      </header>
+      <div class="device-body"></div>
+    </article>
+  </template>
+
+  <template id="video-card-template">
+    <article class="card video">
+      <header>
+        <h2>Video Feed</h2>
+        <p>Placeholder</p>
+      </header>
+      <div class="video-box">
+        <span>Camera feed coming soon</span>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

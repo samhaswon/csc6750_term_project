@@ -1,0 +1,98 @@
+devices:
+  - id: light_kitchen
+    name: Kitchen Lights
+    kind: toggle
+    room: Kitchen
+    state:
+      on: false
+  - id: toaster_home
+    name: Smart Toaster
+    kind: toaster
+    room: Kitchen
+    state:
+      on: false
+  - id: light_living
+    name: Living Room Lights
+    kind: toggle
+    room: Living Room
+    state:
+      on: true
+  - id: blinds_living
+    name: Living Room Blinds
+    kind: blind
+    room: Living Room
+    state:
+      position: 45
+  - id: humidifier_home
+    name: Smart Humidifier
+    kind: humidifier
+    room: Living Room
+    state:
+      level: 40
+  - id: light_master
+    name: Master Bedroom Lights
+    kind: toggle
+    room: Master Bedroom
+    state:
+      on: false
+  - id: blinds_master
+    name: Master Bedroom Blinds
+    kind: blind
+    room: Master Bedroom
+    state:
+      position: 60
+  - id: light_second
+    name: Second Bedroom Lights
+    kind: toggle
+    room: Second Bedroom
+    state:
+      on: false
+  - id: blinds_second
+    name: Second Bedroom Blinds
+    kind: blind
+    room: Second Bedroom
+    state:
+      position: 30
+  - id: light_bathroom
+    name: Bathroom Lights
+    kind: toggle
+    room: Bathroom
+    state:
+      on: false
+  - id: door_front_sensor
+    name: Front Door Sensor
+    kind: sensor
+    room: Entry
+    state:
+      open: false
+  - id: door_front_lock
+    name: Front Door Lock
+    kind: lock
+    room: Entry
+    state:
+      locked: true
+  - id: door_back_sensor
+    name: Back Door Sensor
+    kind: sensor
+    room: Patio
+    state:
+      open: false
+  - id: vacuum_broomba
+    name: Broomba
+    kind: vacuum
+    room: Hallway
+    state:
+      on: false
+      mode: docked
+  - id: thermostat_home
+    name: Smart Thermostat
+    kind: thermostat
+    room: Hallway
+    state:
+      temperature: 21.5
+  - id: pod_bay_doors
+    name: Pod Bay Doors
+    kind: doors
+    room: Garage
+    state:
+      open: false

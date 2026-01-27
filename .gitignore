@@ -1,0 +1,30 @@
+# Python
+**__pycache__/
+*.pyc
+
+# Binaries
+/app
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Build artifacts
+*.out
+
+# Coverage
+*.cover
+coverage.txt
+
+# IDE/editor
+.vscode/
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
