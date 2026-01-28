@@ -7,6 +7,44 @@ const wsDot = document.getElementById('ws-dot');
 let socket;
 let deviceState = new Map();
 let cardRefs = new Map();
+const pageBody = document.body;
+const toasterEasterEgg = {
+  timeoutId: null,
+  active: false,
+};
+
+const clearToasterEasterEgg = () => {
+  if (toasterEasterEgg.timeoutId) {
+    window.clearTimeout(toasterEasterEgg.timeoutId);
+    toasterEasterEgg.timeoutId = null;
+  }
+  toasterEasterEgg.active = false;
+  pageBody.classList.remove('toast-warning');
+};
+
+const scheduleToasterEasterEgg = () => {
+  if (toasterEasterEgg.timeoutId) {
+    return;
+  }
+  toasterEasterEgg.timeoutId = window.setTimeout(() => {
+    toasterEasterEgg.timeoutId = null;
+    toasterEasterEgg.active = true;
+    pageBody.classList.add('toast-warning');
+  }, 30000);
+};
+
+const updateToasterEasterEgg = () => {
+  const toasterOn = Array.from(deviceState.values()).some(
+    (device) => device.kind === 'toaster' && Boolean(device.state?.on)
+  );
+  if (toasterOn) {
+    if (!toasterEasterEgg.active && !toasterEasterEgg.timeoutId) {
+      scheduleToasterEasterEgg();
+    }
+    return;
+  }
+  clearToasterEasterEgg();
+};
 
 const formatValue = (value) => {
   if (typeof value === 'number') {
@@ -264,6 +302,8 @@ const applyDeviceUpdate = (device) => {
       badge.textContent = device.state.open ? 'Open' : 'Closed';
     }
   }
+
+  updateToasterEasterEgg();
 };
 
 const groupDevicesByRoom = (devices) => {
@@ -320,6 +360,8 @@ const renderDevices = (devices) => {
   mediaSection.appendChild(mediaGrid);
   mediaGrid.appendChild(videoTemplate.content.cloneNode(true));
   grid.appendChild(mediaSection);
+
+  updateToasterEasterEgg();
 };
 
 const connect = () => {

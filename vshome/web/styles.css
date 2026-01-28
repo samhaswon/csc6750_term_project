@@ -22,6 +22,34 @@ body {
   background: radial-gradient(circle at top left, #fff5e3 0%, var(--bg) 45%, #e9e1d7 100%);
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  animation: none;
+  background-color: #8a5a3b;
+}
+
+body.toast-warning::before {
+  animation: toastBurn 60s linear forwards;
+}
+
+body.toast-warning {
+  --ink: #f6eee4;
+  --muted: #d5c7bc;
+}
+
+body.toast-warning .card,
+body.toast-warning .status {
+  --ink: #1f1c1a;
+  --muted: #5a5149;
 }
 
 .page {
@@ -32,6 +60,8 @@ body {
   flex-direction: column;
   gap: 28px;
   animation: fadeIn 0.6s ease-out;
+  position: relative;
+  z-index: 1;
 }
 
 .hero {
@@ -276,6 +306,25 @@ h1 {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes toastBurn {
+  0% {
+    opacity: 0;
+    background-color: #8a5a3b;
+  }
+  20% {
+    opacity: 0.4;
+    background-color: #7a4d30;
+  }
+  60% {
+    opacity: 0.75;
+    background-color: #3d2a1c;
+  }
+  100% {
+    opacity: 0.95;
+    background-color: #000000;
   }
 }
 
