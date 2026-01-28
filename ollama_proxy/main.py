@@ -21,7 +21,7 @@ SYSTEM_PROMPT = os.environ.get(
         [
           {
             "name": "list_devices",
-            "description": "List all devices and their state",
+            "description": "List all devices and their state, including id, room, kind, and state keys",
             "parameters": {
               "type": "object",
               "properties": {}
@@ -29,7 +29,7 @@ SYSTEM_PROMPT = os.environ.get(
           },
           {
             "name": "get_device",
-            "description": "Fetch a device by id",
+            "description": "Fetch a device by id to read its current state before replying",
             "parameters": {
               "type": "object",
               "properties": {
@@ -40,7 +40,7 @@ SYSTEM_PROMPT = os.environ.get(
           },
           {
             "name": "update_device_state",
-            "description": "Update device state by id",
+            "description": "Update a device state by id. Use state keys: on, locked, open, position, level, temperature.",
             "parameters": {
               "type": "object",
               "properties": {
@@ -51,6 +51,26 @@ SYSTEM_PROMPT = os.environ.get(
             }
           }
         ]
+
+        How to use the tools:
+        - To turn a device on/off (lights, toaster, vacuum), call update_device_state with state.on true/false.
+        - To lock/unlock, use state.locked true/false.
+        - To open/close doors, use state.open true/false.
+        - To adjust blinds, set state.position 0-100.
+        - To set humidifier, set state.level 0-100.
+        - To set thermostat, set state.temperature in Celsius.
+
+        Examples:
+        - Turn on kitchen lights:
+          [update_device_state(id="light_kitchen", state={"on": true})]
+        - Turn off kitchen lights:
+          [update_device_state(id="light_kitchen", state={"on": false})]
+        - Lock the front door:
+          [update_device_state(id="door_front_lock", state={"locked": true})]
+        - Set living room blinds to 50%:
+          [update_device_state(id="blinds_living", state={"position": 50})]
+        - Read current thermostat:
+          [get_device(id="thermostat_home")]
 
         After a tool call completes that changes state, respond with a short user-facing confirmation.
         If the requested state was already set, say it was already in that state.
@@ -165,6 +185,9 @@ def run_with_tool_loop(prompt, max_steps=2):
     tool_call = extract_function_call(response_text)
     if not tool_call:
         return status, data, None, None
+    tool_call = enrich_tool_call(tool_call, prompt)
+    if not is_valid_tool_call(tool_call):
+        return status, data, tool_call, {"status": 400, "data": {"error": "missing id or state"}}
     for _ in range(max_steps):
         print(f"[tool] model_call={tool_call}")
         tool_result = execute_tool_call(tool_call)
@@ -175,7 +198,9 @@ def run_with_tool_loop(prompt, max_steps=2):
         next_call = extract_function_call(response_text)
         if not next_call:
             return status, data, tool_call, tool_result
-        tool_call = next_call
+        tool_call = enrich_tool_call(next_call, prompt)
+        if not is_valid_tool_call(tool_call):
+            return status, data, tool_call, {"status": 400, "data": {"error": "missing id or state"}}
     return status, data, tool_call, tool_result
 
 
@@ -230,6 +255,26 @@ def extract_function_call(text):
     if not payload:
         return None
     return _tool_args_from_payload(payload)
+
+
+def strip_tool_calls(text):
+    if not text:
+        return ""
+    stripped = text.strip()
+    if stripped.startswith("[") and "]" in stripped:
+        closing = stripped.find("]") + 1
+        remainder = stripped[closing:].strip()
+        return remainder
+    if "```tool_call" in stripped:
+        end = stripped.find("```", stripped.find("```tool_call") + 3)
+        remainder = stripped[end + 3 :].strip() if end != -1 else ""
+        return remainder
+    if "<start_function_call>" in stripped and "<end_function_call>" in stripped:
+        end = stripped.find("<end_function_call>") + len("<end_function_call>")
+        return stripped[end:].strip()
+    if "tool_call:" in stripped.lower():
+        return stripped.split("tool_call:", 1)[-1].strip()
+    return stripped
 
 
 def _extract_from_tool_block(text):
@@ -374,6 +419,8 @@ def _parse_params(text):
         value = value.strip()
         if value.startswith("{") and value.endswith("}"):
             parsed = _decode_json(value)
+            if parsed is None:
+                parsed = _decode_json(_normalize_json_like(value))
             if parsed is not None:
                 params[key] = parsed
                 continue
@@ -382,8 +429,98 @@ def _parse_params(text):
         elif value.startswith("'") and value.endswith("'"):
             params[key] = value[1:-1]
         else:
-            params[key] = value
+            lowered = value.lower()
+            if lowered == "true":
+                params[key] = True
+            elif lowered == "false":
+                params[key] = False
+            else:
+                params[key] = value
     return params
+
+
+def load_devices():
+    status, data = forward_request("GET", "/api/devices")
+    if status != 200 or not isinstance(data, list):
+        return []
+    return data
+
+
+def enrich_tool_call(tool_call, prompt):
+    if not isinstance(tool_call, dict):
+        return tool_call
+    action = tool_call.get("action")
+    devices = load_devices()
+    if action in ("get", "update") and not tool_call.get("id"):
+        tool_call["id"] = infer_device_id(prompt, devices)
+    if action == "update" and not tool_call.get("state"):
+        device = next((d for d in devices if d.get("id") == tool_call.get("id")), None)
+        tool_call["state"] = infer_state(prompt, device)
+    return tool_call
+
+
+def infer_device_id(prompt, devices):
+    prompt_lower = prompt.lower()
+    for device in devices:
+        device_id = str(device.get("id", "")).lower()
+        if device_id and device_id in prompt_lower:
+            return device.get("id")
+    scored = []
+    for device in devices:
+        score = 0
+        name = str(device.get("name", "")).lower()
+        room = str(device.get("room", "")).lower()
+        kind = str(device.get("kind", "")).lower()
+        if name and name in prompt_lower:
+            score += 3
+        if room and room in prompt_lower:
+            score += 1
+        if kind and kind in prompt_lower:
+            score += 1
+        if score:
+            scored.append((score, device.get("id")))
+    if not scored:
+        return None
+    scored.sort(reverse=True)
+    if len(scored) > 1 and scored[0][0] == scored[1][0]:
+        return None
+    return scored[0][1]
+
+
+def infer_state(prompt, device):
+    if not device:
+        return None
+    prompt_lower = prompt.lower()
+    kind = str(device.get("kind", "")).lower()
+    if kind in ("toggle", "toaster", "vacuum"):
+        if "on" in prompt_lower or "turn on" in prompt_lower or "start" in prompt_lower:
+            return {"on": True}
+        if "off" in prompt_lower or "turn off" in prompt_lower or "stop" in prompt_lower:
+            return {"on": False}
+    if kind == "lock":
+        if "unlock" in prompt_lower:
+            return {"locked": False}
+        if "lock" in prompt_lower:
+            return {"locked": True}
+    if kind == "doors":
+        if "open" in prompt_lower:
+            return {"open": True}
+        if "close" in prompt_lower or "shut" in prompt_lower:
+            return {"open": False}
+    return None
+
+
+def is_valid_tool_call(tool_call):
+    if not isinstance(tool_call, dict):
+        return False
+    action = tool_call.get("action")
+    if action == "list":
+        return True
+    if action in ("get", "update") and not tool_call.get("id"):
+        return False
+    if action == "update" and not isinstance(tool_call.get("state"), dict):
+        return False
+    return True
 
 
 def format_user_confirmation(tool_call, tool_result):
@@ -440,6 +577,10 @@ def _decode_json(snippet):
         return None
 
 
+def _normalize_json_like(text):
+    return text.replace("True", "true").replace("False", "false")
+
+
 def _tool_args_from_payload(payload):
     if not isinstance(payload, dict):
         return None
@@ -478,6 +619,10 @@ def execute_tool_call(tool_call):
         state = tool_call.get("state")
         if not device_id:
             return {"status": 400, "data": {"error": "missing id"}}
+        if isinstance(state, str):
+            decoded = _decode_json(state) or _decode_json(_normalize_json_like(state))
+            if decoded is not None:
+                state = decoded
         if not isinstance(state, dict) or not state:
             return {"status": 400, "data": {"error": "missing state"}}
         prev_status, prev_data = forward_request("GET", f"/api/devices/{device_id}")
@@ -544,8 +689,17 @@ class Handler(BaseHTTPRequestHandler):
                 write_json(self, status, data)
                 return
             response_text = data.get("response", "")
-            if not response_text and tool_call and tool_result:
-                response_text = format_user_confirmation(tool_call, tool_result)
+            response_text = strip_tool_calls(response_text)
+            if tool_call and tool_result and (
+                not response_text or extract_function_call(response_text) is not None
+            ):
+                if tool_result.get("data", {}).get("error"):
+                    response_text = (
+                        "I couldn't determine the device or state. "
+                        "Try specifying the exact device, like \"Kitchen Lights\"."
+                    )
+                else:
+                    response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
             if tool_call:
                 payload_out["tool_call"] = tool_call
