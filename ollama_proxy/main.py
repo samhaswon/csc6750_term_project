@@ -51,6 +51,10 @@ SYSTEM_PROMPT = os.environ.get(
             }
           }
         ]
+
+        After a tool call completes that changes state, respond with a short user-facing confirmation.
+        If the requested state was already set, say it was already in that state.
+        If a user is inquiring about state, respond with the current state of the device.
         """
     ),
 )
@@ -117,9 +121,8 @@ def build_full_prompt(user_prompt, tool_result=None):
         prompt_parts.extend(
             [
                 "",
-                "<start_function_response>",
+                "Tool result:",
                 json.dumps(tool_result),
-                "<end_function_response>",
             ]
         )
     prompt_parts.append("Assistant:")
@@ -383,6 +386,45 @@ def _parse_params(text):
     return params
 
 
+def format_user_confirmation(tool_call, tool_result):
+    if not tool_call or not tool_result:
+        return ""
+    if tool_call.get("action") == "list":
+        return "Listed all devices."
+    if tool_call.get("action") == "get":
+        device = tool_result.get("data", {})
+        name = device.get("name") or tool_call.get("id") or "Device"
+        return f"Fetched {name}."
+    if tool_call.get("action") != "update":
+        return "Done."
+    device = tool_result.get("data", {})
+    prev = tool_result.get("previous", {})
+    name = device.get("name") or tool_call.get("id") or "Device"
+    state = device.get("state", {}) if isinstance(device, dict) else {}
+    prev_state = prev.get("state", {}) if isinstance(prev, dict) else {}
+    for key, on_label, off_label in (
+        ("on", "on", "off"),
+        ("locked", "locked", "unlocked"),
+        ("open", "open", "closed"),
+    ):
+        if key in state:
+            is_on = bool(state.get(key))
+            was_on = bool(prev_state.get(key)) if key in prev_state else None
+            if was_on is not None and was_on == is_on:
+                return f"{name} was already {on_label if is_on else off_label}."
+            return f"{name} is now {on_label if is_on else off_label}."
+    if "position" in state:
+        value = state.get("position")
+        return f"{name} is now set to {value}%."
+    if "level" in state:
+        value = state.get("level")
+        return f"{name} is now set to {value}%."
+    if "temperature" in state:
+        value = state.get("temperature")
+        return f"{name} is now set to {value}°C."
+    return f"{name} updated."
+
+
 def _extract_first_json(text):
     start = text.find("{")
     end = text.rfind("}")
@@ -438,8 +480,12 @@ def execute_tool_call(tool_call):
             return {"status": 400, "data": {"error": "missing id"}}
         if not isinstance(state, dict) or not state:
             return {"status": 400, "data": {"error": "missing state"}}
+        prev_status, prev_data = forward_request("GET", f"/api/devices/{device_id}")
         status, data = forward_request("PUT", f"/api/devices/{device_id}", {"state": state})
-        return {"status": status, "data": data}
+        result = {"status": status, "data": data}
+        if prev_status == 200:
+            result["previous"] = prev_data
+        return result
     return {"status": 400, "data": {"error": "unsupported action"}}
 
 
@@ -498,6 +544,8 @@ class Handler(BaseHTTPRequestHandler):
                 write_json(self, status, data)
                 return
             response_text = data.get("response", "")
+            if not response_text and tool_call and tool_result:
+                response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
             if tool_call:
                 payload_out["tool_call"] = tool_call
