@@ -12,19 +12,45 @@ SYSTEM_PROMPT = os.environ.get(
     "SYSTEM_PROMPT",
     (
         """
-        You are the smart home control assistant. You must help with any request to read or
-        change device state. You are allowed to toggle, turn on/off, lock/unlock, open/close, and
-        adjust device values such as temperature, blinds position, or humidity. Do not refuse
-        requests to control appliances or lights.
+        You have access to functions. If you decide to invoke any of the function(s),
+        you MUST put it in the format of:
+        [func_name(param_name=param_value, param_name2=param_value2), func_name2(param)]
+        You SHOULD NOT include any other text in the response if you call a function.
 
-        You can call the smart home tool by responding with a single JSON object (no extra text).
-        Use one of:
-        {"action":"list"}
-        {"action":"get","id":"device_id"}
-        {"action":"update","id":"device_id","state":{...}}
-
-        If you need to change state, respond ONLY with the JSON tool call. Do not ask for the
-        desired state if the user already specified it.
+        Available functions:
+        [
+          {
+            "name": "list_devices",
+            "description": "List all devices and their state",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "get_device",
+            "description": "Fetch a device by id",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" }
+              },
+              "required": ["id"]
+            }
+          },
+          {
+            "name": "update_device_state",
+            "description": "Update device state by id",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "state": { "type": "object" }
+              },
+              "required": ["id", "state"]
+            }
+          }
+        ]
         """
     ),
 )
@@ -81,15 +107,29 @@ def build_system_prompt():
             f"- {name} (id: {device_id}, kind: {kind}, room: {room}, state: {state})"
         )
     lines.append("")
-    lines.append("Respond ONLY with the JSON tool call when acting.")
+    # lines.append("Respond ONLY with a tool call when acting.")
     return "\n".join(lines)
 
 
-def call_ollama(prompt):
+def build_full_prompt(user_prompt, tool_result=None):
+    prompt_parts = [build_system_prompt(), "", f"User: {user_prompt}"]
+    if tool_result is not None:
+        prompt_parts.extend(
+            [
+                "",
+                "<start_function_response>",
+                json.dumps(tool_result),
+                "<end_function_response>",
+            ]
+        )
+    prompt_parts.append("Assistant:")
+    return "\n".join(prompt_parts)
+
+
+def call_ollama(prompt, tool_result=None):
     payload = {
         "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "system": build_system_prompt(),
+        "prompt": build_full_prompt(prompt, tool_result),
         "stream": False,
     }
     request = Request(
@@ -99,7 +139,7 @@ def call_ollama(prompt):
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urlopen(request, timeout=30) as response:
+        with urlopen(request, timeout=60) as response:
             status = response.getcode()
             data = json.loads(response.read().decode("utf-8"))
             output = data.get("response", "")
@@ -119,22 +159,17 @@ def run_with_tool_loop(prompt, max_steps=2):
     if status != 200:
         return status, data, None, None
     response_text = data.get("response", "")
-    tool_call = extract_json_object(response_text)
+    tool_call = extract_function_call(response_text)
     if not tool_call:
         return status, data, None, None
     for _ in range(max_steps):
         print(f"[tool] model_call={tool_call}")
         tool_result = execute_tool_call(tool_call)
-        follow_up = (
-            f"{prompt}\n\nTool call:\n{json.dumps(tool_call)}\n"
-            f"Tool result:\n{json.dumps(tool_result)}\n\n"
-            "Respond with a final confirmation or another JSON tool call."
-        )
-        status, data = call_ollama(follow_up)
+        status, data = call_ollama(prompt, tool_result=tool_result)
         if status != 200:
             return status, data, tool_call, tool_result
         response_text = data.get("response", "")
-        next_call = extract_json_object(response_text)
+        next_call = extract_function_call(response_text)
         if not next_call:
             return status, data, tool_call, tool_result
         tool_call = next_call
@@ -164,21 +199,228 @@ def should_pull(error_payload):
     return "not found" in message and "model" in message
 
 
-def extract_json_object(text):
+def extract_function_call(text):
     if not text:
         return None
+    tool_payload = _extract_from_bracket_calls(text)
+    if tool_payload:
+        return tool_payload
+    tool_payload = _extract_from_tool_block(text)
+    if tool_payload:
+        return tool_payload
+    tool_payload = _extract_from_inline_call(text)
+    if tool_payload:
+        return tool_payload
+    start_tag = "<start_function_call>"
+    end_tag = "<end_function_call>"
+    start = text.find(start_tag)
+    end = text.find(end_tag)
+    if start != -1 and end != -1 and end > start:
+        snippet = text[start + len(start_tag) : end].strip()
+        payload = _decode_json(snippet)
+        if payload:
+            return _tool_args_from_payload(payload)
+    snippet = _extract_first_json(text)
+    if not snippet:
+        return None
+    payload = _decode_json(snippet)
+    if not payload:
+        return None
+    return _tool_args_from_payload(payload)
+
+
+def _extract_from_tool_block(text):
+    marker = "```tool_call"
+    start = text.find(marker)
+    if start == -1:
+        return None
+    end = text.find("```", start + len(marker))
+    if end == -1:
+        return None
+    block = text[start + len(marker) : end].strip()
+    snippet = _extract_first_json(block)
+    if not snippet:
+        return None
+    payload = _decode_json(snippet)
+    if not payload:
+        return None
+    return _tool_args_from_payload(payload)
+
+
+def _extract_from_inline_call(text):
+    lower = text.lower()
+    if "update_device_state" in lower:
+        snippet = _extract_first_json(text)
+        if snippet:
+            payload = _decode_json(snippet)
+            if payload:
+                payload["name"] = "update_device_state"
+                return _tool_args_from_payload(payload)
+    if "get_device" in lower:
+        snippet = _extract_first_json(text)
+        if snippet:
+            payload = _decode_json(snippet)
+            if payload:
+                payload["name"] = "get_device"
+                return _tool_args_from_payload(payload)
+    if "list_devices" in lower:
+        return {"action": "list"}
+    if "smart_home.update" in lower:
+        snippet = _extract_first_json(text)
+        if snippet:
+            payload = _decode_json(snippet)
+            if payload:
+                payload["name"] = "update_device_state"
+                return _tool_args_from_payload(payload)
+    return None
+
+
+def _extract_from_bracket_calls(text):
+    stripped = text.strip()
+    if not (stripped.startswith("[") and stripped.endswith("]")):
+        return None
+    inner = stripped[1:-1].strip()
+    if not inner:
+        return None
+    calls = []
+    current = []
+    depth = 0
+    in_string = False
+    quote = ""
+    for char in inner:
+        if char in ("'", "\""):
+            if in_string and char == quote:
+                in_string = False
+                quote = ""
+            elif not in_string:
+                in_string = True
+                quote = char
+        if char == "(" and not in_string:
+            depth += 1
+        elif char == ")" and not in_string:
+            depth = max(depth - 1, 0)
+        if char == "," and depth == 0 and not in_string:
+            calls.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+    if current:
+        calls.append("".join(current).strip())
+    if not calls:
+        return None
+    tool_calls = []
+    for call in calls:
+        parsed = _parse_function_call(call)
+        if parsed:
+            tool_calls.append(parsed)
+    if not tool_calls:
+        return None
+    return tool_calls[0] if len(tool_calls) == 1 else {"batch": tool_calls}
+
+
+def _parse_function_call(text):
+    if "(" not in text or not text.endswith(")"):
+        return None
+    name, args = text.split("(", 1)
+    name = name.strip()
+    args = args[:-1].strip()
+    if name == "list_devices":
+        return {"action": "list"}
+    if name == "get_device":
+        params = _parse_params(args)
+        return {"action": "get", "id": params.get("id")}
+    if name == "update_device_state":
+        params = _parse_params(args)
+        return {"action": "update", "id": params.get("id"), "state": params.get("state")}
+    return None
+
+
+def _parse_params(text):
+    if not text:
+        return {}
+    params = {}
+    parts = []
+    current = []
+    depth = 0
+    in_string = False
+    quote = ""
+    for char in text:
+        if char in ("'", "\""):
+            if in_string and char == quote:
+                in_string = False
+                quote = ""
+            elif not in_string:
+                in_string = True
+                quote = char
+        if char == "{" and not in_string:
+            depth += 1
+        elif char == "}" and not in_string:
+            depth = max(depth - 1, 0)
+        if char == "," and depth == 0 and not in_string:
+            parts.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+    if current:
+        parts.append("".join(current).strip())
+    for part in parts:
+        if "=" not in part:
+            continue
+        key, value = part.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if value.startswith("{") and value.endswith("}"):
+            parsed = _decode_json(value)
+            if parsed is not None:
+                params[key] = parsed
+                continue
+        if value.startswith("\"") and value.endswith("\""):
+            params[key] = value[1:-1]
+        elif value.startswith("'") and value.endswith("'"):
+            params[key] = value[1:-1]
+        else:
+            params[key] = value
+    return params
+
+
+def _extract_first_json(text):
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1 or end <= start:
         return None
-    snippet = text[start : end + 1]
+    return text[start : end + 1]
+
+
+def _decode_json(snippet):
     try:
         return json.loads(snippet)
     except json.JSONDecodeError:
         return None
 
 
+def _tool_args_from_payload(payload):
+    if not isinstance(payload, dict):
+        return None
+    name = payload.get("name")
+    if name == "smart_home":
+        return payload.get("arguments") or payload.get("parameters")
+    if name == "list_devices":
+        return {"action": "list"}
+    if name == "get_device":
+        args = payload.get("arguments") or payload.get("parameters") or {}
+        return {"action": "get", "id": args.get("id")}
+    if name == "update_device_state":
+        args = payload.get("arguments") or payload.get("parameters") or {}
+        return {"action": "update", "id": args.get("id"), "state": args.get("state")}
+    if "action" in payload:
+        return payload
+    return None
+
+
 def execute_tool_call(tool_call):
+    if "batch" in tool_call and isinstance(tool_call["batch"], list):
+        results = [execute_tool_call(item) for item in tool_call["batch"]]
+        return {"status": 207, "data": results}
     action = tool_call.get("action")
     if action == "list":
         status, data = forward_request("GET", "/api/devices")

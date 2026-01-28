@@ -14,6 +14,13 @@ services:
     ports:
       - "11434:11434"
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   ollama_proxy:
     container_name: ollama_proxy
     build:
@@ -21,6 +28,8 @@ services:
     environment:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434
+      # Model to use for Ollama, either
+      # gemma3n:e2b
       - OLLAMA_MODEL=gemma3n:e2b
     ports:
       - "8090:8090"
