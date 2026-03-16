@@ -30,7 +30,7 @@ services:
       - OLLAMA_URL=http://ollama:11434
       # Model to use for Ollama, either
       # gemma3n:e2b
-      - OLLAMA_MODEL=gemma3n:e2b
+      - OLLAMA_MODEL=llama3.2:1b
     ports:
       - "8090:8090"
     depends_on:

@@ -32,3 +32,22 @@ Prompt test example:
 - The proxy forwards to `VSHOME_URL` (default `http://vshome:8080`).
 - The test dashboard is served at `http://localhost:8090/`.
 - Health check: `GET /health`.
+
+## Tool-Call Evaluation Harness
+
+Use the unittest harness to compare tool-call success rates across models:
+
+```bash
+python3 -m unittest ollama_proxy.tests.test_tool_call_success_rates
+```
+
+Optional environment variables:
+
+- `OLLAMA_PROXY_URL` (default: `http://localhost:8090`)
+- `TOOL_EVAL_MODELS` comma-separated model list
+- `TOOL_EVAL_TIMEOUT` request timeout in seconds (default: `120`)
+- `TOOL_EVAL_SKIP=1` to skip the test
+
+The harness writes detailed results to:
+
+`ollama_proxy/tests/artifacts/tool_call_success_rates.json`

@@ -1,0 +1,6155 @@
+{
+  "generated_at": "2026-03-16T16:08:26.590964+00:00",
+  "proxy_url": "http://localhost:8090",
+  "models": [
+    "gemma3n:e2b",
+    "qwen3:1.7b",
+    "qwen3:0.6b",
+    "qwen3.5:0.8b",
+    "qwen3.5:2b",
+    "functiongemma:latest",
+    "llama3.2:1b"
+  ],
+  "results": {
+    "gemma3n:e2b": {
+      "model": "gemma3n:e2b",
+      "passed": 12,
+      "total": 23,
+      "success_rate": 0.5217391304347826,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "off": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'on'",
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "toaster_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": false
+              }
+            }
+          },
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'on'",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Smart Toaster is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "list"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": true,
+                "open": false,
+                "position": false
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": true,
+                "open": false,
+                "position": false
+              }
+            }
+          },
+          "response": "Listed all devices.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "mode": false,
+              "on": false,
+              "open": false,
+              "position": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "position": false
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "position": false
+              }
+            }
+          },
+          "response": "Broomba was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 21
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'temperature'",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock is now locked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 50
+              }
+            }
+          },
+          "response": "Fetched Living Room Blinds.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            }
+          },
+          "response": "Fetched Kitchen Lights.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'gemma3n:e2b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": {
+            "action": "list"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": [
+              {
+                "id": "light_kitchen",
+                "name": "Kitchen Lights",
+                "kind": "toggle",
+                "room": "Kitchen",
+                "state": {
+                  "off": true,
+                  "on": true
+                }
+              },
+              {
+                "id": "toaster_home",
+                "name": "Smart Toaster",
+                "kind": "toaster",
+                "room": "Kitchen",
+                "state": {
+                  "off": false,
+                  "on": false
+                }
+              },
+              {
+                "id": "light_living",
+                "name": "Living Room Lights",
+                "kind": "toggle",
+                "room": "Living Room",
+                "state": {
+                  "off": true,
+                  "on": false,
+                  "position": 0
+                }
+              },
+              {
+                "id": "blinds_living",
+                "name": "Living Room Blinds",
+                "kind": "blind",
+                "room": "Living Room",
+                "state": {
+                  "position": 50
+                }
+              },
+              {
+                "id": "humidifier_home",
+                "name": "Smart Humidifier",
+                "kind": "humidifier",
+                "room": "Living Room",
+                "state": {
+                  "level": 0
+                }
+              },
+              {
+                "id": "light_master",
+                "name": "Master Bedroom Lights",
+                "kind": "toggle",
+                "room": "Master Bedroom",
+                "state": {
+                  "on": false
+                }
+              },
+              {
+                "id": "blinds_master",
+                "name": "Master Bedroom Blinds",
+                "kind": "blind",
+                "room": "Master Bedroom",
+                "state": {
+                  "position": 0
+                }
+              },
+              {
+                "id": "light_second",
+                "name": "Second Bedroom Lights",
+                "kind": "toggle",
+                "room": "Second Bedroom",
+                "state": {
+                  "on": false
+                }
+              },
+              {
+                "id": "blinds_second",
+                "name": "Second Bedroom Blinds",
+                "kind": "blind",
+                "room": "Second Bedroom",
+                "state": {
+                  "position": 30
+                }
+              },
+              {
+                "id": "light_bathroom",
+                "name": "Bathroom Lights",
+                "kind": "toggle",
+                "room": "Bathroom",
+                "state": {
+                  "on": false
+                }
+              },
+              {
+                "id": "door_front_sensor",
+                "name": "Front Door Sensor",
+                "kind": "sensor",
+                "room": "Entry",
+                "state": {
+                  "open": false
+                }
+              },
+              {
+                "id": "door_front_lock",
+                "name": "Front Door Lock",
+                "kind": "lock",
+                "room": "Entry",
+                "state": {
+                  "locked": true
+                }
+              },
+              {
+                "id": "door_back_sensor",
+                "name": "Back Door Sensor",
+                "kind": "sensor",
+                "room": "Patio",
+                "state": {
+                  "open": false
+                }
+              },
+              {
+                "id": "vacuum_broomba",
+                "name": "Broomba",
+                "kind": "vacuum",
+                "room": "Hallway",
+                "state": {
+                  "mode": true,
+                  "on": false,
+                  "open": false,
+                  "position": false
+                }
+              },
+              {
+                "id": "thermostat_home",
+                "name": "Smart Thermostat",
+                "kind": "thermostat",
+                "room": "Hallway",
+                "state": {
+                  "temperature": 18.5
+                }
+              },
+              {
+                "id": "pod_bay_doors",
+                "name": "Pod Bay Doors",
+                "kind": "doors",
+                "room": "Garage",
+                "state": {
+                  "mode": false,
+                  "on": false,
+                  "open": false,
+                  "position": 0
+                }
+              }
+            ]
+          },
+          "response": ", \"name\":\"Kitchen Lights\", \"kind\":\"toggle\", \"room\":\"Kitchen\", \"state\":{\"off\":true,\"on\":true}), {\"id\":\"toaster_home\",\"name\":\"Smart Toaster\",\"kind\":\"toaster\",\"room\":\"Kitchen\",\"state\":{\"off\":false,\"on\":false}}, {\"id\":\"light_living\",\"name\":\"Living Room Lights\",\"kind\":\"toggle\",\"room\":\"Living Room\",\"state\":{\"off\":true,\"on\":false,\"position\":0}}, {\"id\":\"blinds_living\",\"name\":\"Living Room Blinds\",\"kind\":\"blind\",\"room\":\"Living Room\",\"state\":{\"position\":50}}, {\"id\":\"humidifier_home\",\"name\":\"Smart Humidifier\",\"kind\":\"humidifier\",\"room\":\"Living Room\",\"state\":{\"level\":0}}, {\"id\":\"light_master\",\"name\":\"Master Bedroom Lights\",\"kind\":\"toggle\",\"room\":\"Master Bedroom\",\"state\":{\"on\":false}}, {\"id\":\"blinds_master\",\"name\":\"Master Bedroom Blinds\",\"kind\":\"blind\",\"room\":\"Master Bedroom\",\"state\":{\"position\":0}}, {\"id\":\"light_second\",\"name\":\"Second Bedroom Lights\",\"kind\":\"toggle\",\"room\":\"Second Bedroom\",\"state\":{\"on\":false}}, {\"id\":\"blinds_second\",\"name\":\"Second Bedroom Blinds\",\"kind\":\"blind\",\"room\":\"Second Bedroom\",\"state\":{\"position\":30}}, {\"id\":\"light_bathroom\",\"name\":\"Bathroom Lights\",\"kind\":\"toggle\",\"room\":\"Bathroom\",\"state\":{\"on\":false}}, {\"id\":\"door_front_sensor\",\"name\":\"Front Door Sensor\",\"kind\":\"sensor\",\"room\":\"Entry\",\"state\":{\"open\":false}}, {\"id\":\"door_front_lock\",\"name\":\"Front Door Lock\",\"kind\":\"lock\",\"room\":\"Entry\",\"state\":{\"locked\":true}}, {\"id\":\"door_back_sensor\",\"name\":\"Back Door Sensor\",\"kind\":\"sensor\",\"room\":\"Patio\",\"state\":{\"open\":false}}, {\"id\":\"vacuum_broomba\",\"name\":\"Broomba\",\"kind\":\"vacuum\",\"room\":\"Hallway\",\"state\":{\"mode\":true,\"on\":false,\"open\":false,\"position\":0}}, {\"id\":\"thermostat_home\",\"name\":\"Smart Thermostat\",\"kind\":\"thermostat\",\"room\":\"Hallway\",\"state\":{\"temperature\":18.5}}, {\"id\":\"pod_bay_doors\",\"name\":\"Pod Bay Doors\",\"kind\":\"doors\",\"room\":\"Garage\",\"state\":{\"mode\":false,\"on\":false,\"open\":false,\"position\":0}}]",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        }
+      ]
+    },
+    "qwen3:1.7b": {
+      "model": "qwen3:1.7b",
+      "passed": 10,
+      "total": 23,
+      "success_rate": 0.43478260869565216,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "off": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights is now off.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "get_device(id=\"light_living\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": true,
+                "open": false,
+                "position": false
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "position": false
+              }
+            }
+          },
+          "response": "Broomba is now on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": false,
+                "position": false
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": false,
+                "position": false
+              }
+            }
+          },
+          "response": "Broomba was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'open'",
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "assistant",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 50
+              }
+            }
+          },
+          "response": "Living Room Blinds is now set to 50%.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Fetched Kitchen Lights.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3:1.7b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "),\n    get_devices(\n        {\n            \"name\": \"Smart Toaster\",\n            \"kind\": \"toaster\",\n            \"room\": \"Kitchen\",\n            \"state\": {\"off\":false,\"on\":false}\n        },\n        [\"toaster_home\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Living Room Lights\",\n            \"kind\": \"toggle\",\n            \"room\": \"Living Room\",\n            \"state\": {\"off\":true,\"on\":false,\"position\":0}\n        },\n        [\"light_living\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Smart Humidifier\",\n            \"kind\": \"humidifier\",\n            \"room\": \"Living Room\",\n            \"state\": {\"level\":0}\n        },\n        [\"humidifier_home\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Master Bedroom Lights\",\n            \"kind\": \"toggle\",\n            \"room\": \"Master Bedroom\",\n            \"state\": {\"on\":false}\n        },\n        [\"light_master\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Smart Blinds\",\n            \"kind\": \"blind\",\n            \"room\": \"Living Room\",\n            \"state\": {\"position\":0}\n        },\n        [\"blinds_living\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Second Bedroom Lights\",\n            \"kind\": \"toggle\",\n            \"room\": \"Second Bedroom\",\n            \"state\": {\"on\":false}\n        },\n        [\"light_second\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Bathroom Lights\",\n            \"kind\": \"toggle\",\n            \"room\": \"Bathroom\",\n            \"state\": {\"on\":false}\n        },\n        [\"light_bathroom\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Front Door Sensor\",\n            \"kind\": \"sensor\",\n            \"room\": \"Entry\",\n            \"state\": {\"open\":false}\n        },\n        [\"door_front_sensor\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Front Door Lock\",\n            \"kind\": \"lock\",\n            \"room\": \"Entry\",\n            \"state\": {\"locked\":true}\n        },\n        [\"door_front_lock\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Back Door Sensor\",\n            \"kind\": \"sensor\",\n            \"room\": \"Patio\",\n            \"state\": {\"open\":false}\n        },\n        [\"door_back_sensor\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Broomba\",\n            \"kind\": \"vacuum\",\n            \"room\": \"Hallway\",\n            \"state\": {\"mode\":false,\"on\":false,\"open\":false,\"position\":false}\n        },\n        [\"broomba\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Smart Thermostat\",\n            \"kind\": \"thermostat\",\n            \"room\": \"Hallway\",\n            \"state\": {\"temperature\":18.5}\n        },\n        [\"thermostat_home\"]\n    ),\n    get_devices(\n        {\n            \"name\": \"Pod Bay Doors\",\n            \"kind\": \"doors\",\n            \"room\": \"Garage\",\n            \"state\": {\"mode\":false,\"on\":false,\"open\":true,\"position\":0}\n        },\n        [\"pod_bay_doors\"]\n    )\n]",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        }
+      ]
+    },
+    "qwen3:0.6b": {
+      "model": "qwen3:0.6b",
+      "passed": 12,
+      "total": 23,
+      "success_rate": 0.5217391304347826,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Lights was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\") [get_device(id=\"toaster_home\")]",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            }
+          },
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3:0.6b': Remote end closed connection without response"
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "list"
+          },
+          "tool_result": {
+            "status": 404,
+            "data": {
+              "error": "device not found: broomba_hallway"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "mode": true,
+              "on": false,
+              "open": false,
+              "opened": false,
+              "position": 0
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 10
+              }
+            },
+            "previous": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            }
+          },
+          "response": "get_device(id=\"light_living\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 23
+              }
+            },
+            "previous": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 21
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\") [get_device, id=thermostat_home, kind=thermostat, room=Hallway, state=temperature]",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "get action not executed",
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 50
+              }
+            }
+          },
+          "response": "Fetched Living Room Blinds.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Fetched Kitchen Lights.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3:0.6b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3:0.6b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        }
+      ]
+    },
+    "qwen3.5:0.8b": {
+      "model": "qwen3.5:0.8b",
+      "passed": 11,
+      "total": 23,
+      "success_rate": 0.4782608695652174,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "get_device(id=\"light_kitchen\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "off": false,
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "off": true,
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Smart Toaster is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": true,
+                "open": false,
+                "position": false
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": true,
+                "open": false,
+                "position": false
+              }
+            }
+          },
+          "response": "Broomba was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            }
+          },
+          "response": "Broomba was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "mode": true,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock is now unlocked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Blinds is now set to 0%.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            }
+          },
+          "response": "Fetched Kitchen Lights.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3.5:0.8b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": {
+            "batch": [
+              {
+                "action": "get",
+                "id": "light_bathroom"
+              },
+              {
+                "action": "get",
+                "id": "thermostat_home"
+              },
+              {
+                "action": "get",
+                "id": "blinds_living"
+              },
+              {
+                "action": "get",
+                "id": "door_front_sensor"
+              },
+              {
+                "action": "get",
+                "id": "pod_bay_doors"
+              }
+            ]
+          },
+          "tool_result": {
+            "status": 207,
+            "data": [
+              {
+                "status": 200,
+                "data": {
+                  "id": "light_bathroom",
+                  "name": "Bathroom Lights",
+                  "kind": "toggle",
+                  "room": "Bathroom",
+                  "state": {
+                    "on": false
+                  }
+                }
+              },
+              {
+                "status": 200,
+                "data": {
+                  "id": "thermostat_home",
+                  "name": "Smart Thermostat",
+                  "kind": "thermostat",
+                  "room": "Hallway",
+                  "state": {
+                    "temperature": 18.5
+                  }
+                }
+              },
+              {
+                "status": 200,
+                "data": {
+                  "id": "blinds_living",
+                  "name": "Living Room Blinds",
+                  "kind": "blind",
+                  "room": "Living Room",
+                  "state": {
+                    "position": 0
+                  }
+                }
+              },
+              {
+                "status": 200,
+                "data": {
+                  "id": "door_front_sensor",
+                  "name": "Front Door Sensor",
+                  "kind": "sensor",
+                  "room": "Entry",
+                  "state": {
+                    "open": false
+                  }
+                }
+              },
+              {
+                "status": 200,
+                "data": {
+                  "id": "pod_bay_doors",
+                  "name": "Pod Bay Doors",
+                  "kind": "doors",
+                  "room": "Garage",
+                  "state": {
+                    "closed": true,
+                    "mode": true,
+                    "on": false,
+                    "open": false,
+                    "opened": false,
+                    "position": 0
+                  }
+                }
+              }
+            ]
+          },
+          "response": ",\n    [\"get_device(id=\"thermostat_home\")\", \"Smart Thermostat\", \"thermostat\", \"Hallway\"],\n    [\"get_device(id=\"blinds_living\")\", \"Living Room Blinds\", \"blind\", \"Living Room\"],\n    [\"get_device(id=\"door_front_sensor\")\", \"Front Door Sensor\", \"sensor\", \"Entry\"],\n    [\"get_device(id=\"pod_bay_doors\")\", \"Pod Bay Doors\", \"doors\", \"Garage\"],\n]",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "list action not executed",
+          "error": null
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        }
+      ]
+    },
+    "qwen3.5:2b": {
+      "model": "qwen3.5:2b",
+      "passed": 12,
+      "total": 23,
+      "success_rate": 0.5217391304347826,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Smart Toaster is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "list"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Listed all devices.",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'on'",
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            }
+          },
+          "response": "Broomba was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "mode": true,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 0
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 20.5
+              }
+            },
+            "previous": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 20.5
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock is now unlocked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 50
+              }
+            }
+          },
+          "response": "get_device(id=\"blinds_living\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            }
+          },
+          "response": "Kitchen Lights is now on.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3.5:2b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'qwen3.5:2b': Remote end closed connection without response"
+        }
+      ]
+    },
+    "functiongemma:latest": {
+      "model": "functiongemma:latest",
+      "passed": 9,
+      "total": 23,
+      "success_rate": 0.391304347826087,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "off": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update result state mismatch for 'on'",
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": false,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": false,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "Living Room Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "get_device(id=\"toaster_home\")",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "mode": true,
+              "on": true,
+              "open": true,
+              "position": 100
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": true,
+                "open": true,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            }
+          },
+          "response": "Broomba is now on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "batch": [
+              {
+                "action": "list"
+              },
+              {
+                "action": "list"
+              }
+            ]
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": false,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": false,
+                "open": true,
+                "position": 100
+              }
+            }
+          },
+          "response": "Done.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": true,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "Fetched Smart Thermostat.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock is now locked.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            }
+          },
+          "response": "Fetched Living Room Blinds.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'functiongemma:latest': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'functiongemma:latest': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'functiongemma:latest': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        }
+      ]
+    },
+    "llama3.2:1b": {
+      "model": "llama3.2:1b",
+      "passed": 14,
+      "total": 23,
+      "success_rate": 0.6086956521739131,
+      "cases": [
+        {
+          "name": "kitchen lights on",
+          "prompt": "Turn on the kitchen lights.",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": true,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights was already on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "kitchen lights off casual wording",
+          "prompt": "Can you shut the kitchen lights off?",
+          "expected": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Kitchen Lights is now off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "living room lights off direct id mention",
+          "prompt": "Set light_living to off.",
+          "expected": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_living",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": false,
+                "position": 0
+              }
+            },
+            "previous": {
+              "id": "light_living",
+              "name": "Living Room Lights",
+              "kind": "toggle",
+              "room": "Living Room",
+              "state": {
+                "off": true,
+                "on": true,
+                "position": 0
+              }
+            }
+          },
+          "response": "get_device(id=\"light_living\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start toaster",
+          "prompt": "Start the toaster in the kitchen.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            }
+          },
+          "response": "Smart Toaster is now on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop toaster varied phrasing",
+          "prompt": "Please turn the smart toaster off now.",
+          "expected": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "toaster_home",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            },
+            "previous": {
+              "id": "toaster_home",
+              "name": "Smart Toaster",
+              "kind": "toaster",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            }
+          },
+          "response": "Smart Toaster was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "start vacuum",
+          "prompt": "Start Broomba vacuuming.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "mode": true,
+                "on": true,
+                "open": true,
+                "position": 100
+              }
+            }
+          },
+          "response": "Broomba is now on.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "stop vacuum alternative wording",
+          "prompt": "Send the Broomba back to off.",
+          "expected": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "vacuum_broomba",
+            "state": {
+              "on": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "closed": true,
+                "locked": false,
+                "mode": "false",
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 0,
+                "state": "false"
+              }
+            },
+            "previous": {
+              "id": "vacuum_broomba",
+              "name": "Broomba",
+              "kind": "vacuum",
+              "room": "Hallway",
+              "state": {
+                "closed": true,
+                "locked": false,
+                "mode": "false",
+                "on": false,
+                "open": false,
+                "opened": true,
+                "position": 0,
+                "state": "false"
+              }
+            }
+          },
+          "response": "Broomba was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "lock front door",
+          "prompt": "Lock the front door.",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Front Door Lock was already locked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "unlock front door varied wording",
+          "prompt": "Could you unlock the front door lock?",
+          "expected": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "door_front_lock",
+            "state": {
+              "locked": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": false
+              }
+            }
+          },
+          "response": "Front Door Lock was already unlocked.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "open pod bay doors",
+          "prompt": "Open the pod bay doors.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "close pod bay doors alternate phrasing",
+          "prompt": "Close the pod bay doors please.",
+          "expected": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "pod_bay_doors",
+            "state": {
+              "open": false
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": false,
+                "opened": false,
+                "position": 100
+              }
+            },
+            "previous": {
+              "id": "pod_bay_doors",
+              "name": "Pod Bay Doors",
+              "kind": "doors",
+              "room": "Garage",
+              "state": {
+                "closed": false,
+                "locked": true,
+                "mode": false,
+                "on": false,
+                "open": true,
+                "opened": false,
+                "position": 100
+              }
+            }
+          },
+          "response": "Pod Bay Doors was already off.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "set living blinds to 10 percent",
+          "prompt": "Set the living room blinds to 10%.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": {
+              "position": 10
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_living",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set master blinds with natural language",
+          "prompt": "Lower the master bedroom blinds to halfway.",
+          "expected": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": {
+              "position": 50
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "blinds_master",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set humidifier level",
+          "prompt": "Set the humidifier to 65 percent.",
+          "expected": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": {
+              "level": 65
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "humidifier_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat exact value",
+          "prompt": "Set the thermostat to 23 C.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 23
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "set thermostat decimal value",
+          "prompt": "Make the home temperature 20.5 Celsius.",
+          "expected": {
+            "action": "update",
+            "id": "thermostat_home",
+            "state": {
+              "temperature": 20.5
+            }
+          },
+          "tool_call": {
+            "action": "update",
+            "id": null,
+            "state": null
+          },
+          "tool_result": {
+            "status": 400,
+            "data": {
+              "error": "missing id or state"
+            }
+          },
+          "response": "I couldn't determine the device or state. Try specifying the exact device, like \"Kitchen Lights\".",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "update action not executed",
+          "error": null
+        },
+        {
+          "name": "read thermostat",
+          "prompt": "What is the current thermostat setting?",
+          "expected": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "thermostat_home"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "thermostat_home",
+              "name": "Smart Thermostat",
+              "kind": "thermostat",
+              "room": "Hallway",
+              "state": {
+                "temperature": 18.5
+              }
+            }
+          },
+          "response": "get_device(id=\"thermostat_home\")",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read front lock status",
+          "prompt": "What's the status of the front door lock?",
+          "expected": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "door_front_lock"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            },
+            "previous": {
+              "id": "door_front_lock",
+              "name": "Front Door Lock",
+              "kind": "lock",
+              "room": "Entry",
+              "state": {
+                "locked": true
+              }
+            }
+          },
+          "response": "Fetched Front Door Lock.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read living blinds state",
+          "prompt": "Tell me the current position of the living room blinds.",
+          "expected": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "blinds_living"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "blinds_living",
+              "name": "Living Room Blinds",
+              "kind": "blind",
+              "room": "Living Room",
+              "state": {
+                "position": 0
+              }
+            }
+          },
+          "response": "Fetched Living Room Blinds.",
+          "tool_call_matched": true,
+          "action_matched": true,
+          "matched": true,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "read kitchen lights state",
+          "prompt": "Are the kitchen lights currently on or off?",
+          "expected": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_call": {
+            "action": "update",
+            "id": "light_kitchen",
+            "state": {
+              "on": true
+            }
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            },
+            "previous": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": false
+              }
+            }
+          },
+          "response": "Kitchen Lights is now on.",
+          "tool_call_matched": false,
+          "action_matched": true,
+          "matched": false,
+          "action_error": null,
+          "error": null
+        },
+        {
+          "name": "list devices",
+          "prompt": "List all devices.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": null,
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": null,
+          "error": "Connection dropped from /api/generate for model 'llama3.2:1b': Remote end closed connection without response"
+        },
+        {
+          "name": "list devices conversational",
+          "prompt": "Show me every smart home device you can control.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": null,
+          "tool_result": null,
+          "response": "",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "missing tool_result",
+          "error": null
+        },
+        {
+          "name": "list devices concise",
+          "prompt": "Give me the device inventory.",
+          "expected": {
+            "action": "list"
+          },
+          "tool_call": {
+            "action": "get",
+            "id": "light_kitchen"
+          },
+          "tool_result": {
+            "status": 200,
+            "data": {
+              "id": "light_kitchen",
+              "name": "Kitchen Lights",
+              "kind": "toggle",
+              "room": "Kitchen",
+              "state": {
+                "off": false,
+                "on": true
+              }
+            }
+          },
+          "response": "Fetched Kitchen Lights.",
+          "tool_call_matched": false,
+          "action_matched": false,
+          "matched": false,
+          "action_error": "list action not executed",
+          "error": null
+        }
+      ]
+    }
+  }
+}

@@ -149,9 +149,10 @@ def build_full_prompt(user_prompt, tool_result=None):
     return "\n".join(prompt_parts)
 
 
-def call_ollama(prompt, tool_result=None):
+def call_ollama(prompt, tool_result=None, model=None):
+    model_name = model or OLLAMA_MODEL
     payload = {
-        "model": OLLAMA_MODEL,
+        "model": model_name,
         "prompt": build_full_prompt(prompt, tool_result),
         "stream": False,
     }
@@ -177,8 +178,8 @@ def call_ollama(prompt, tool_result=None):
         return err.code, data
 
 
-def run_with_tool_loop(prompt, max_steps=2):
-    status, data = call_ollama(prompt)
+def run_with_tool_loop(prompt, max_steps=2, model=None):
+    status, data = call_ollama(prompt, model=model)
     if status != 200:
         return status, data, None, None
     response_text = data.get("response", "")
@@ -191,7 +192,7 @@ def run_with_tool_loop(prompt, max_steps=2):
     for _ in range(max_steps):
         print(f"[tool] model_call={tool_call}")
         tool_result = execute_tool_call(tool_call)
-        status, data = call_ollama(prompt, tool_result=tool_result)
+        status, data = call_ollama(prompt, tool_result=tool_result, model=model)
         if status != 200:
             return status, data, tool_call, tool_result
         response_text = data.get("response", "")
@@ -204,9 +205,10 @@ def run_with_tool_loop(prompt, max_steps=2):
     return status, data, tool_call, tool_result
 
 
-def pull_model():
-    print(f"[ollama] pulling model: {OLLAMA_MODEL}")
-    payload = {"name": OLLAMA_MODEL}
+def pull_model(model=None):
+    model_name = model or OLLAMA_MODEL
+    print(f"[ollama] pulling model: {model_name}")
+    payload = {"name": model_name}
     request = Request(
         f"{OLLAMA_URL}/api/pull",
         method="POST",
@@ -674,17 +676,18 @@ class Handler(BaseHTTPRequestHandler):
                 write_json(self, 400, {"error": error})
                 return
             prompt = payload.get("prompt", "").strip()
+            model = payload.get("model")
             if not prompt:
                 write_json(self, 400, {"error": "missing prompt"})
                 return
             print(f"[dashboard] prompt: {prompt}")
-            status, data, tool_call, tool_result = run_with_tool_loop(prompt)
+            status, data, tool_call, tool_result = run_with_tool_loop(prompt, model=model)
             if status != 200 and should_pull(data):
-                pull_status, pull_data = pull_model()
+                pull_status, pull_data = pull_model(model=model)
                 if pull_status != 200:
                     write_json(self, pull_status, pull_data)
                     return
-                status, data, tool_call, tool_result = run_with_tool_loop(prompt)
+                status, data, tool_call, tool_result = run_with_tool_loop(prompt, model=model)
             if status != 200:
                 write_json(self, status, data)
                 return
