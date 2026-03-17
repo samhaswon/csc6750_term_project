@@ -715,7 +715,7 @@ class Handler(BaseHTTPRequestHandler):
             write_json(self, 404, {"error": "not found"})
             return
         payload, error = read_json(self)
-        if error:
+        if error or payload is None:
             write_json(self, 400, {"error": error})
             return
         action = payload.get("action")
