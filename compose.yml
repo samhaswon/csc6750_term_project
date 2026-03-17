@@ -28,9 +28,8 @@ services:
     environment:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434
-      # Model to use for Ollama, either
-      # gemma3n:e2b
-      - OLLAMA_MODEL=llama3.2:1b
+      # Model to use for Ollama
+      - OLLAMA_MODEL=functiongemma:latest
     ports:
       - "8090:8090"
     depends_on:
