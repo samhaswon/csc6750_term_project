@@ -12,6 +12,7 @@ Base station:
 - Ollama running locally to host the LLM
 - Other models run within the local service
   - TTS? https://huggingface.co/collections/Qwen/qwen3-tts
+- Whisper transcription service exposed over HTTP
 - Web cam and microphone of the device running the demo used as the "doorbell."
 
 Cloud:
@@ -30,8 +31,13 @@ sudo docker compose up -d --build
 
 Virtual smart home UI: http://localhost:8080
 
+Whisper transcription API: `http://localhost:8100/v1/audio/transcriptions`
+
 ## Ollama + FunctionGemma
 
 - Ollama runs on `http://localhost:11434`.
 - The smart home tool proxy runs on `http://localhost:8090`.
 - Tool bridge endpoint: `POST /tools/smart_home` (see `ollama_proxy/README.md`).
+- The Whisper service runs on `http://localhost:8100`.
+- Health check: `GET /health`
+- Transcription endpoint: `POST /v1/audio/transcriptions` (see `whisper_service/README.md`).

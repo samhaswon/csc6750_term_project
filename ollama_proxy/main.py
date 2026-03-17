@@ -189,6 +189,7 @@ def run_with_tool_loop(prompt, max_steps=2, model=None):
     tool_call = enrich_tool_call(tool_call, prompt)
     if not is_valid_tool_call(tool_call):
         return status, data, tool_call, {"status": 400, "data": {"error": "missing id or state"}}
+    tool_result = None  # Linting
     for _ in range(max_steps):
         print(f"[tool] model_call={tool_call}")
         tool_result = execute_tool_call(tool_call)
@@ -672,7 +673,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path == "/api/generate":
             payload, error = read_json(self)
-            if error:
+            if error or payload is None:
                 write_json(self, 400, {"error": error})
                 return
             prompt = payload.get("prompt", "").strip()
