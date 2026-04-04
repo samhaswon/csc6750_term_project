@@ -2,6 +2,8 @@
 
 Local HTTP service for OpenAI Whisper transcription.
 
+Might port this to a faster version in the future: https://github.com/SYSTRAN/faster-whisper
+
 ## Endpoint
 
 - `POST /v1/audio/transcriptions`

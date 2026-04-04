@@ -25,6 +25,10 @@ services:
     container_name: ollama_proxy
     build:
       context: ./ollama_proxy
+    devices:
+      - /dev/video0:/dev/video0
+    group_add:
+      - video
     environment:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434

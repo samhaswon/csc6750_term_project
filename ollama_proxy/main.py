@@ -7,7 +7,7 @@ from pathlib import Path
 
 VSHOME_URL = os.environ.get("VSHOME_URL", "http://vshome:8080").rstrip("/")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://ollama:11434").rstrip("/")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "functiongemma:latest")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "functiongemma:latest").strip()
 SYSTEM_PROMPT = os.environ.get(
     "SYSTEM_PROMPT",
     (
@@ -81,6 +81,35 @@ SYSTEM_PROMPT = os.environ.get(
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
+def _decode_response_payload(raw_payload):
+    text = raw_payload.decode("utf-8", errors="replace").strip()
+    if not text:
+        return {}
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    parsed_rows = []
+    for line in text.splitlines():
+        entry = line.strip()
+        if not entry:
+            continue
+        try:
+            parsed_rows.append(json.loads(entry))
+        except json.JSONDecodeError:
+            continue
+    if parsed_rows:
+        return parsed_rows[-1]
+    return {"raw": text}
+
+
+def _as_object_payload(payload):
+    if isinstance(payload, dict):
+        return payload
+    return {"data": payload}
+
+
 def read_json(handler):
     content_length = int(handler.headers.get("Content-Length", 0))
     if content_length <= 0:
@@ -111,9 +140,9 @@ def forward_request(method, path, body=None):
     request = Request(url, method=method, data=data, headers=headers)
     try:
         with urlopen(request, timeout=10) as response:
-            return response.getcode(), json.loads(response.read().decode("utf-8"))
+            return response.getcode(), _decode_response_payload(response.read())
     except HTTPError as err:
-        return err.code, json.loads(err.read().decode("utf-8"))
+        return err.code, _decode_response_payload(err.read())
 
 
 def build_system_prompt():
@@ -149,6 +178,50 @@ def build_full_prompt(user_prompt, tool_result=None):
     return "\n".join(prompt_parts)
 
 
+def list_ollama_models():
+    request = Request(f"{OLLAMA_URL}/api/tags", method="GET")
+    try:
+        with urlopen(request, timeout=10) as response:
+            data = _decode_response_payload(response.read())
+    except HTTPError:
+        return []
+    if not isinstance(data, dict):
+        return []
+    models = data.get("models")
+    if not isinstance(models, list):
+        return []
+    names = []
+    for model in models:
+        if not isinstance(model, dict):
+            continue
+        name = model.get("name")
+        if isinstance(name, str) and name.strip():
+            names.append(name.strip())
+    return names
+
+
+def resolve_model_name(requested_model):
+    target = (requested_model or OLLAMA_MODEL or "").strip()
+    available_models = list_ollama_models()
+    if not target:
+        if available_models:
+            return available_models[0], available_models
+        return None, available_models
+    if target in available_models:
+        return target, available_models
+    lower_map = {name.lower(): name for name in available_models}
+    if target.lower() in lower_map:
+        return lower_map[target.lower()], available_models
+    base_name = target.split(":", 1)[0]
+    for name in available_models:
+        if name == f"{base_name}:latest":
+            return name, available_models
+    for name in available_models:
+        if name.startswith(f"{base_name}:"):
+            return name, available_models
+    return target, available_models
+
+
 def call_ollama(prompt, tool_result=None, model=None):
     model_name = model or OLLAMA_MODEL
     payload = {
@@ -165,7 +238,7 @@ def call_ollama(prompt, tool_result=None, model=None):
     try:
         with urlopen(request, timeout=60) as response:
             status = response.getcode()
-            data = json.loads(response.read().decode("utf-8"))
+            data = _as_object_payload(_decode_response_payload(response.read()))
             output = data.get("response", "")
             if output:
                 print(f"[ollama] response: {output}")
@@ -173,7 +246,7 @@ def call_ollama(prompt, tool_result=None, model=None):
                 print(f"[ollama] empty response payload: {data}")
             return status, data
     except HTTPError as err:
-        data = json.loads(err.read().decode("utf-8"))
+        data = _as_object_payload(_decode_response_payload(err.read()))
         print(f"[ollama] error {err.code}: {data}")
         return err.code, data
 
@@ -218,9 +291,9 @@ def pull_model(model=None):
     )
     try:
         with urlopen(request, timeout=120) as response:
-            return response.getcode(), json.loads(response.read().decode("utf-8"))
+            return response.getcode(), _decode_response_payload(response.read())
     except HTTPError as err:
-        return err.code, json.loads(err.read().decode("utf-8"))
+        return err.code, _decode_response_payload(err.read())
 
 
 def should_pull(error_payload):
@@ -529,6 +602,8 @@ def is_valid_tool_call(tool_call):
 def format_user_confirmation(tool_call, tool_result):
     if not tool_call or not tool_result:
         return ""
+    if isinstance(tool_call, dict) and isinstance(tool_call.get("batch"), list):
+        return f"Processed {len(tool_call['batch'])} tool calls."
     if tool_call.get("action") == "list":
         return "Listed all devices."
     if tool_call.get("action") == "get":
@@ -563,6 +638,26 @@ def format_user_confirmation(tool_call, tool_result):
         value = state.get("temperature")
         return f"{name} is now set to {value}°C."
     return f"{name} updated."
+
+
+def extract_tool_error(tool_result):
+    if not isinstance(tool_result, dict):
+        return None
+    direct_error = tool_result.get("error")
+    if direct_error:
+        return str(direct_error)
+    data = tool_result.get("data")
+    if isinstance(data, dict):
+        data_error = data.get("error")
+        if data_error:
+            return str(data_error)
+        return None
+    if isinstance(data, list):
+        for item in data:
+            item_error = extract_tool_error(item)
+            if item_error:
+                return item_error
+    return None
 
 
 def _extract_first_json(text):
@@ -678,17 +773,55 @@ class Handler(BaseHTTPRequestHandler):
                 return
             prompt = payload.get("prompt", "").strip()
             model = payload.get("model")
+            if isinstance(model, str):
+                model = model.strip() or None
             if not prompt:
                 write_json(self, 400, {"error": "missing prompt"})
                 return
             print(f"[dashboard] prompt: {prompt}")
-            status, data, tool_call, tool_result = run_with_tool_loop(prompt, model=model)
+            effective_model, available_models = resolve_model_name(model)
+            if not effective_model:
+                write_json(self, 503, {"error": "no ollama models available"})
+                return
+            if model and model != effective_model:
+                print(f"[ollama] requested model '{model}' resolved to '{effective_model}'")
+            status, data, tool_call, tool_result = run_with_tool_loop(
+                prompt, model=effective_model
+            )
             if status != 200 and should_pull(data):
-                pull_status, pull_data = pull_model(model=model)
+                pull_status, pull_data = pull_model(model=effective_model)
                 if pull_status != 200:
-                    write_json(self, pull_status, pull_data)
+                    if available_models:
+                        fallback_model = available_models[0]
+                        print(
+                            f"[ollama] pull failed for '{effective_model}', "
+                            f"falling back to '{fallback_model}'"
+                        )
+                        status, data, tool_call, tool_result = run_with_tool_loop(
+                            prompt, model=fallback_model
+                        )
+                        if status == 200:
+                            response_text = strip_tool_calls(data.get("response", ""))
+                            payload_out = {"response": response_text, "model": fallback_model}
+                            if tool_call:
+                                payload_out["tool_call"] = tool_call
+                            if tool_result:
+                                payload_out["tool_result"] = tool_result
+                            write_json(self, 200, payload_out)
+                            return
+                    write_json(
+                        self,
+                        pull_status,
+                        {
+                            "error": pull_data.get("error", "model pull failed"),
+                            "model": effective_model,
+                            "available_models": available_models,
+                        },
+                    )
                     return
-                status, data, tool_call, tool_result = run_with_tool_loop(prompt, model=model)
+                status, data, tool_call, tool_result = run_with_tool_loop(
+                    prompt, model=effective_model
+                )
             if status != 200:
                 write_json(self, status, data)
                 return
@@ -697,7 +830,8 @@ class Handler(BaseHTTPRequestHandler):
             if tool_call and tool_result and (
                 not response_text or extract_function_call(response_text) is not None
             ):
-                if tool_result.get("data", {}).get("error"):
+                tool_error = extract_tool_error(tool_result)
+                if tool_error:
                     response_text = (
                         "I couldn't determine the device or state. "
                         "Try specifying the exact device, like \"Kitchen Lights\"."
