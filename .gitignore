@@ -34,3 +34,4 @@ Thumbs.db
 
 # Data
 ollama-data/
+ollama_proxy/tests/artifacts/*
