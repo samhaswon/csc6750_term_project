@@ -14,18 +14,20 @@ from urllib.request import Request, urlopen
 Last results:
 
 model                | passed | total | success_rate
+gemma4:e2b           | 17     | 23    | 73.9%
 gemma3n:e2b          | 11     | 23    | 47.8%
-qwen3:1.7b           | 10     | 23    | 43.5%
-qwen3:0.6b           | 10     | 23    | 43.5%
+qwen3:1.7b           | 14     | 23    | 60.9%
+qwen3:0.6b           | 12     | 23    | 52.2%
 qwen3.5:0.8b         |  9     | 23    | 39.1%
 qwen3.5:2b           |  6     | 23    | 26.1%
 functiongemma:latest | 11     | 23    | 47.8%
-llama3.2:1b          | 10     | 23    | 43.5%
+llama3.2:1b          | 12     | 23    | 52.2%
 """
 
 DEFAULT_PROXY_URL = "http://localhost:8090"
 DEFAULT_MODELS = [
     "gemma3n:e2b",
+    "gemma4:e2b",
     "qwen3:1.7b",
     "qwen3:0.6b",
     "qwen3.5:0.8b",

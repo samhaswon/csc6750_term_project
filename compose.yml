@@ -29,7 +29,7 @@ services:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434
       # Model to use for Ollama
-      - OLLAMA_MODEL=functiongemma:latest
+      - OLLAMA_MODEL=gemma4:e2b
     ports:
       - "8090:8090"
     depends_on:
@@ -57,7 +57,26 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+  kitten_tts_service:
+    container_name: kitten_tts_service
+    build:
+      context: ./kitten_tts_service
+    environment:
+      - KITTEN_MODEL=KittenML/kitten-tts-nano-0.8
+      - KITTEN_MODEL_DIR=/models/kitten_tts
+      - KITTEN_CACHE_DB=/data/kitten_tts/cache.sqlite3
+      - KITTEN_DEVICE=auto
+      - KITTEN_DEFAULT_VOICE=Bella
+      - MAX_INPUT_CHARS=5000
+    volumes:
+      - kitten-model-data:/models/kitten_tts
+      - kitten-cache-data:/data/kitten_tts
+    ports:
+      - "8110:8110"
+    restart: unless-stopped
 
 volumes:
   ollama-data:
   whisper-model-data:
+  kitten-model-data:
+  kitten-cache-data:
