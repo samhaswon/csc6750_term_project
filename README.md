@@ -13,6 +13,7 @@ Base station:
 - Other models run within the local service
   - TTS? https://huggingface.co/collections/Qwen/qwen3-tts
 - Whisper transcription service exposed over HTTP
+- KittenTTS speech generation service with local cache
 - Web cam and microphone of the device running the demo used as the "doorbell."
 
 Cloud:
@@ -32,6 +33,7 @@ sudo docker compose up -d --build
 Virtual smart home UI: http://localhost:8080
 
 Whisper transcription API: `http://localhost:8100/v1/audio/transcriptions`
+KittenTTS speech API: `http://localhost:8110/v1/audio/speech`
 
 ## Ollama + FunctionGemma
 
@@ -41,3 +43,6 @@ Whisper transcription API: `http://localhost:8100/v1/audio/transcriptions`
 - The Whisper service runs on `http://localhost:8100`.
 - Health check: `GET /health`
 - Transcription endpoint: `POST /v1/audio/transcriptions` (see `whisper_service/README.md`).
+- The KittenTTS service runs on `http://localhost:8110`.
+- Health check: `GET /health`
+- Speech endpoint: `POST /v1/audio/speech` (see `kitten_tts_service/README.md`).
