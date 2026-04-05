@@ -39,6 +39,10 @@ KittenTTS speech API: `http://localhost:8110/v1/audio/speech`
 
 - Ollama runs on `http://localhost:11434`.
 - The smart home tool proxy runs on `http://localhost:8090`.
+
+> [!NOTE]
+> You must use localhost here for Chrome, otherwise it cannot use the microphone.
+
 - Tool bridge endpoint: `POST /tools/smart_home` (see `ollama_proxy/README.md`).
 - The Whisper service runs on `http://localhost:8100`.
 - Health check: `GET /health`

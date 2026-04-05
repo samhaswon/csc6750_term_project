@@ -89,6 +89,27 @@ AUTH_ENABLED = os.environ.get("AUTH_ENABLED", "true").strip().lower() in (
     "yes",
     "on",
 )
+DEFAULT_WAKE_WORDS = "hey home,ok home"
+
+
+def parse_wake_words(raw_value):
+    if not isinstance(raw_value, str):
+        return ["hey home"]
+    words = [item.strip().lower() for item in raw_value.split(",")]
+    normalized = [item for item in words if item]
+    return normalized if normalized else ["hey home"]
+
+
+def parse_positive_int(raw_value, default_value):
+    try:
+        parsed = int(raw_value)
+    except (TypeError, ValueError):
+        return default_value
+    return parsed if parsed > 0 else default_value
+
+
+WAKE_WORDS = parse_wake_words(os.environ.get("WAKE_WORDS", DEFAULT_WAKE_WORDS))
+WAKE_COMMAND_TIMEOUT_MS = parse_positive_int(os.environ.get("WAKE_COMMAND_TIMEOUT_MS"), 8000)
 
 
 def _decode_response_payload(raw_payload):
@@ -896,6 +917,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/health":
             write_json(self, 200, {"status": "ok"})
+            return
+        if self.path == "/api/wake_word_config":
+            write_json(
+                self,
+                200,
+                {
+                    "wake_words": WAKE_WORDS,
+                    "command_timeout_ms": WAKE_COMMAND_TIMEOUT_MS,
+                    "speech_recognition_required": True,
+                },
+            )
             return
         content, content_type = read_static(self.path)
         if content is None:

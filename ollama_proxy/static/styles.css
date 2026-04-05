@@ -88,11 +88,34 @@ textarea {
   padding: 14px;
   font-family: inherit;
   font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea.wake-glow {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(81, 214, 198, 0.28);
+}
+
+textarea.wake-pulse {
+  border-color: var(--accent);
+  animation: wakePulse 0.9s ease-in-out infinite;
 }
 
 .actions {
   display: flex;
   gap: 12px;
+}
+
+.wake-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wake-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 button {
@@ -118,6 +141,24 @@ button {
   background: transparent;
   color: var(--muted);
   border-color: var(--border);
+}
+
+#wake-toggle {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+@keyframes wakePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(81, 214, 198, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(81, 214, 198, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(81, 214, 198, 0);
+  }
 }
 
 .cards {

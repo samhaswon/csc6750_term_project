@@ -2,6 +2,8 @@
 
 Small HTTP proxy that translates tool calls into REST calls for the virtual smart home.
 
+<mark>Note:</mark> this must be accessed using localhost if you wish to use the microphone.
+
 ## Endpoints
 
 - `POST /tools/smart_home`
@@ -33,6 +35,15 @@ Prompt test example:
 - The proxy can call `DEEPFACE_URL` (default `http://deepface_service:8120`) for protected actions.
 - The test dashboard is served at `http://localhost:8090/`.
 - Health check: `GET /health`.
+- Wake word config endpoint: `GET /api/wake_word_config`.
+
+## Wake Word
+
+The dashboard supports wake-word voice control using browser Speech Recognition.
+
+- Defaults: `hey home`, `ok home`
+- `WAKE_WORDS` environment variable accepts comma-separated wake words
+- `WAKE_COMMAND_TIMEOUT_MS` controls how long the listener waits for a command after wake word
 
 ## Protected Actions
 

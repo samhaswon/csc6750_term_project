@@ -51,6 +51,9 @@ services:
       - DEEPFACE_URL=http://deepface_service:8120
       # Model to use for Ollama
       - OLLAMA_MODEL=gemma4:e2b
+      # Wake-word controls used by the web dashboard
+      - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal
+      - WAKE_COMMAND_TIMEOUT_MS=8000
     ports:
       - "8090:8090"
     depends_on:
