@@ -9,6 +9,7 @@ Small HTTP proxy that translates tool calls into REST calls for the virtual smar
 - `POST /tools/smart_home`
 - `POST /api/generate`
 - `POST /api/speak`
+- `POST /api/ollama/unload`
 
 Request body examples:
 
@@ -40,6 +41,8 @@ Prompt test example:
 - Wake word config endpoint: `GET /api/wake_word_config`.
 - Ollama context size override: `OLLAMA_CONTEXT_SIZE` (default `8192`) via `options.num_ctx`.
 - Hide tool metadata in `/api/generate`: `HIDE_TOOL_CALL_RESULTS` (default `false`).
+- Include tool metadata per request: `{"include_tool_details": true}` in `/api/generate`.
+- Model remap fallback toggle: `OLLAMA_ALLOW_MODEL_FAMILY_FALLBACK` (default `false`).
 
 ## Wake Word
 

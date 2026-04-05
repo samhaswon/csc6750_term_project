@@ -126,6 +126,9 @@ WAKE_WORDS = parse_wake_words(os.environ.get("WAKE_WORDS", DEFAULT_WAKE_WORDS))
 WAKE_COMMAND_TIMEOUT_MS = parse_positive_int(os.environ.get("WAKE_COMMAND_TIMEOUT_MS"), 8000)
 OLLAMA_CONTEXT_SIZE = parse_positive_int(os.environ.get("OLLAMA_CONTEXT_SIZE"), 8192)
 HIDE_TOOL_CALL_RESULTS = parse_bool(os.environ.get("HIDE_TOOL_CALL_RESULTS"), False)
+ALLOW_MODEL_FAMILY_FALLBACK = parse_bool(
+    os.environ.get("OLLAMA_ALLOW_MODEL_FAMILY_FALLBACK"), False
+)
 
 
 def _decode_response_payload(raw_payload):
@@ -406,6 +409,8 @@ def resolve_model_name(requested_model):
     lower_map = {name.lower(): name for name in available_models}
     if target.lower() in lower_map:
         return lower_map[target.lower()], available_models
+    if not ALLOW_MODEL_FAMILY_FALLBACK:
+        return target, available_models
     base_name = target.split(":", 1)[0]
     for name in available_models:
         if name == f"{base_name}:latest":
@@ -414,6 +419,27 @@ def resolve_model_name(requested_model):
         if name.startswith(f"{base_name}:"):
             return name, available_models
     return target, available_models
+
+
+def unload_ollama_model(model):
+    model_name = (model or OLLAMA_MODEL).strip()
+    payload = {
+        "model": model_name,
+        "prompt": "",
+        "stream": False,
+        "keep_alive": 0,
+    }
+    request = Request(
+        f"{OLLAMA_URL}/api/generate",
+        method="POST",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=30) as response:
+            return response.getcode(), _decode_response_payload(response.read())
+    except HTTPError as err:
+        return err.code, _decode_response_payload(err.read())
 
 
 def call_ollama(prompt, tool_result=None, model=None):
@@ -993,6 +1019,17 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def do_POST(self):
+        if self.path == "/api/ollama/unload":
+            payload, error = read_json(self)
+            if error or payload is None:
+                write_json(self, 400, {"error": error})
+                return
+            model = payload.get("model")
+            if isinstance(model, str):
+                model = model.strip() or None
+            status, data = unload_ollama_model(model)
+            write_json(self, status, data if isinstance(data, dict) else {"data": data})
+            return
         if self.path == "/api/speak":
             payload, error = read_json(self)
             if error or payload is None:
@@ -1021,6 +1058,8 @@ class Handler(BaseHTTPRequestHandler):
             model = payload.get("model")
             if isinstance(model, str):
                 model = model.strip() or None
+            include_tool_details = parse_bool(payload.get("include_tool_details"), False)
+            show_tool_details = include_tool_details or not HIDE_TOOL_CALL_RESULTS
             if not prompt:
                 write_json(self, 400, {"error": "missing prompt"})
                 return
@@ -1049,9 +1088,9 @@ class Handler(BaseHTTPRequestHandler):
                         if status == 200:
                             response_text = strip_tool_calls(data.get("response", ""))
                             payload_out = {"response": response_text, "model": fallback_model}
-                            if tool_call and not HIDE_TOOL_CALL_RESULTS:
+                            if tool_call and show_tool_details:
                                 payload_out["tool_call"] = tool_call
-                            if tool_result and not HIDE_TOOL_CALL_RESULTS:
+                            if tool_result and show_tool_details:
                                 payload_out["tool_result"] = tool_result
                             write_json(self, 200, payload_out)
                             return
@@ -1090,9 +1129,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
-            if tool_call and not HIDE_TOOL_CALL_RESULTS:
+            if tool_call and show_tool_details:
                 payload_out["tool_call"] = tool_call
-            if tool_result and not HIDE_TOOL_CALL_RESULTS:
+            if tool_result and show_tool_details:
                 payload_out["tool_result"] = tool_result
             write_json(self, 200, payload_out)
             return

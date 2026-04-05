@@ -14,14 +14,14 @@ from urllib.request import Request, urlopen
 Last results:
 
 model                | passed | total | success_rate
-gemma4:e2b           | 17     | 23    | 73.9%
-gemma3n:e2b          | 11     | 23    | 47.8%
-qwen3:1.7b           | 14     | 23    | 60.9%
-qwen3:0.6b           | 12     | 23    | 52.2%
-qwen3.5:0.8b         |  9     | 23    | 39.1%
-qwen3.5:2b           |  6     | 23    | 26.1%
-functiongemma:latest | 11     | 23    | 47.8%
-llama3.2:1b          | 12     | 23    | 52.2%
+gemma3n:e2b          | 18     | 23    | 78.3%
+gemma4:e2b           | 21     | 23    | 91.3%
+qwen3:1.7b           | 17     | 23    | 73.9%
+qwen3:0.6b           | 10     | 23    | 43.5%
+qwen3.5:0.8b         |  0     | 23    |  0.0%
+qwen3.5:2b           |  7     | 23    | 30.4%
+functiongemma:latest |  0     | 23    |  0.0%
+llama3.2:1b          |  9     | 23    | 39.1%
 """
 
 DEFAULT_PROXY_URL = "http://localhost:8090"
@@ -275,6 +275,7 @@ class ToolCallSuccessRateHarness(unittest.TestCase):
         payload = {
             "prompt": prompt,
             "model": model,
+            "include_tool_details": True,
         }
         body = json.dumps(payload).encode("utf-8")
         request = Request(
@@ -302,6 +303,42 @@ class ToolCallSuccessRateHarness(unittest.TestCase):
         except (TimeoutError, SocketTimeout) as err:
             raise RuntimeError(
                 f"Timed out calling /api/generate for model '{model}': {err}"
+            )
+
+    @classmethod
+    def _unload_model(cls, model):
+        """Unload a model from Ollama to reduce cross-model carryover.
+
+        :param model: Model name to unload.
+        :raises RuntimeError: If request fails.
+        """
+        payload = {"model": model}
+        body = json.dumps(payload).encode("utf-8")
+        request = Request(
+            f"{cls._proxy_url()}/api/ollama/unload",
+            method="POST",
+            data=body,
+            headers={"Content-Type": "application/json"},
+        )
+        try:
+            with urlopen(request, timeout=cls._request_timeout()) as response:
+                return response.getcode(), json.loads(response.read().decode("utf-8"))
+        except HTTPError as err:
+            error_body = err.read().decode("utf-8", errors="replace")
+            raise RuntimeError(
+                f"HTTP {err.code} from /api/ollama/unload for model '{model}': {error_body}"
+            )
+        except URLError as err:
+            raise RuntimeError(
+                f"Could not reach {cls._proxy_url()} /api/ollama/unload: {err.reason}"
+            )
+        except RemoteDisconnected as err:
+            raise RuntimeError(
+                f"Connection dropped from /api/ollama/unload: {err}"
+            )
+        except (TimeoutError, SocketTimeout) as err:
+            raise RuntimeError(
+                f"Timed out calling /api/ollama/unload for model '{model}': {err}"
             )
 
     @classmethod
@@ -361,12 +398,34 @@ class ToolCallSuccessRateHarness(unittest.TestCase):
         return True
 
     @classmethod
+    def _is_auth_protected_update(cls, expected):
+        """Return True when expected update is protected by face auth.
+
+        :param expected: Expected case payload.
+        """
+        if expected.get("action") != "update":
+            return False
+        state = expected.get("state")
+        if not isinstance(state, dict):
+            return False
+        device_id = expected.get("id", "")
+        if "temperature" in state:
+            return True
+        if state.get("locked") is False and "lock" in device_id:
+            return True
+        if state.get("open") is True and "doors" in device_id:
+            return True
+        return False
+
+    @classmethod
     def _prepare_case_state(cls, expected):
         """Set a deterministic baseline for update cases.
 
         :param expected: Expected action payload for the case.
         """
         if expected.get("action") != "update":
+            return
+        if cls._is_auth_protected_update(expected):
             return
         device_id = expected.get("id")
         target_state = expected.get("state")
@@ -424,6 +483,12 @@ class ToolCallSuccessRateHarness(unittest.TestCase):
         if not isinstance(tool_result, dict):
             return False, "missing tool_result"
         data = tool_result.get("data")
+        if tool_result.get("status") == 403 and cls._is_auth_protected_update(expected):
+            error_message = ""
+            if isinstance(data, dict):
+                error_message = str(data.get("error", ""))
+            if "authorization rejected" in error_message:
+                return True, None
         if tool_result.get("status") != 200 or not isinstance(data, dict):
             return False, "update action not executed"
         if data.get("id") != expected.get("id"):
@@ -530,8 +595,14 @@ class ToolCallSuccessRateHarness(unittest.TestCase):
         models = self._models()
         self.assertGreater(len(models), 0, "No models configured")
 
+        previous_model = None
         for model in models:
+            if previous_model:
+                self._unload_model(previous_model)
             self.results[model] = self._evaluate_model(model)
+            previous_model = model
+        if previous_model:
+            self._unload_model(previous_model)
 
         artifact_path = self._write_artifact()
         self._print_summary()
