@@ -21,6 +21,22 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+  deepface_service:
+    container_name: deepface_service
+    build:
+      context: ./deepface_service
+    environment:
+      - DEEPFACE_DATA_DIR=/data/deepface
+      - DEEPFACE_ACCESS_FILE=/data/deepface/access.yaml
+      - DEEPFACE_LOG_FILE=/data/deepface/auth.log
+      - DEEPFACE_MODEL_NAME=Facenet512
+      - DEEPFACE_DETECTOR_BACKEND=opencv
+      - DEEPFACE_ENFORCE_DETECTION=false
+    volumes:
+      - ./deepface_data:/data/deepface
+    ports:
+      - "8120:8120"
+    restart: unless-stopped
   ollama_proxy:
     container_name: ollama_proxy
     build:
@@ -32,12 +48,14 @@ services:
     environment:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434
+      - DEEPFACE_URL=http://deepface_service:8120
       # Model to use for Ollama
       - OLLAMA_MODEL=gemma4:e2b
     ports:
       - "8090:8090"
     depends_on:
       - vshome
+      - deepface_service
     restart: unless-stopped
   whisper_service:
     container_name: whisper_service

@@ -4,6 +4,65 @@ const clearButton = document.getElementById('clear');
 const cards = document.getElementById('cards');
 const status = document.getElementById('status');
 
+const MESSAGES = [
+  'Accomplishing',
+  'Actioning',
+  'Actualizing',
+  'Baking',
+  'Brewing',
+  'Calculating',
+  'Cerebrating',
+  'Churning',
+  'Clauding',
+  'Coalescing',
+  'Cogitating',
+  'Computing',
+  'Conjuring',
+  'Considering',
+  'Cooking',
+  'Crafting',
+  'Creating',
+  'Crunching',
+  'Deliberating',
+  'Determining',
+  'Doing',
+  'Effecting',
+  'Finagling',
+  'Forging',
+  'Forming',
+  'Generating',
+  'Hatching',
+  'Herding',
+  'Honking',
+  'Hustling',
+  'Ideating',
+  'Inferring',
+  'Manifesting',
+  'Marinating',
+  'Moseying',
+  'Mulling',
+  'Mustering',
+  'Musing',
+  'Noodling',
+  'Percolating',
+  'Pondering',
+  'Processing',
+  'Puttering',
+  'Reticulating',
+  'Ruminating',
+  'Schlepping',
+  'Shucking',
+  'Simmering',
+  'Smooshing',
+  'Spinning',
+  'Stewing',
+  'Synthesizing',
+  'Thinking',
+  'Transmuting',
+  'Vibing',
+  'Working',
+];
+
 const setStatus = (text) => {
   status.textContent = text;
 };
@@ -28,7 +87,7 @@ const runPrompt = async () => {
     return;
   }
   runButton.disabled = true;
-  setStatus('Generating...');
+  setStatus(`${MESSAGES[Math.floor(Math.random() * MESSAGES.length)]}...`);
   addCard('Prompt', prompt);
   try {
     const response = await fetch('/api/generate', {

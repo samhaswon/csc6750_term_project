@@ -35,3 +35,6 @@ Thumbs.db
 # Data
 ollama-data/
 ollama_proxy/tests/artifacts/*
+deepface_data/people/**
+!deepface_data/people/.gitkeep
+deepface_data/auth.log

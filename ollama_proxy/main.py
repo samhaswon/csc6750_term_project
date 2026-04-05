@@ -1,9 +1,10 @@
+import base64
 import json
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.error import HTTPError
-from urllib.request import Request, urlopen
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 VSHOME_URL = os.environ.get("VSHOME_URL", "http://vshome:8080").rstrip("/")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://ollama:11434").rstrip("/")
@@ -79,6 +80,15 @@ SYSTEM_PROMPT = os.environ.get(
     ),
 )
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+DEEPFACE_URL = os.environ.get("DEEPFACE_URL", "http://deepface_service:8120").rstrip("/")
+CAMERA_INDEX = int(os.environ.get("CAMERA_INDEX", "0"))
+CAMERA_CAPTURE_ATTEMPTS = int(os.environ.get("CAMERA_CAPTURE_ATTEMPTS", "3"))
+AUTH_ENABLED = os.environ.get("AUTH_ENABLED", "true").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
 
 
 def _decode_response_payload(raw_payload):
@@ -143,6 +153,118 @@ def forward_request(method, path, body=None):
             return response.getcode(), _decode_response_payload(response.read())
     except HTTPError as err:
         return err.code, _decode_response_payload(err.read())
+
+
+def _to_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        return lowered in {"1", "true", "yes", "on"}
+    if isinstance(value, (int, float)):
+        return value != 0
+    return False
+
+
+def determine_protected_action(device, state):
+    if not isinstance(device, dict) or not isinstance(state, dict):
+        return None
+    kind = str(device.get("kind", "")).lower()
+    if kind == "lock" and "locked" in state and _to_bool(state.get("locked")) is False:
+        return "unlock_door"
+    if kind == "doors" and "open" in state and _to_bool(state.get("open")) is True:
+        return "open_garage"
+    if kind == "thermostat" and "temperature" in state:
+        return "set_thermostat"
+    return None
+
+
+def capture_webcam_frame_base64():
+    try:
+        import cv2
+    except ImportError:
+        return None, "opencv_unavailable"
+
+    camera = cv2.VideoCapture(CAMERA_INDEX)
+    if not camera.isOpened():
+        camera.release()
+        return None, "camera_unavailable"
+    frame = None
+    try:
+        for _ in range(CAMERA_CAPTURE_ATTEMPTS):
+            ok, candidate = camera.read()
+            if ok and candidate is not None:
+                frame = candidate
+    finally:
+        camera.release()
+
+    if frame is None:
+        return None, "camera_read_failed"
+    ok, encoded = cv2.imencode(".jpg", frame)
+    if not ok:
+        return None, "camera_encode_failed"
+    return base64.b64encode(encoded.tobytes()).decode("ascii"), None
+
+
+def authorize_sensitive_action(desired_action):
+    frame_base64, capture_error = capture_webcam_frame_base64()
+    if capture_error:
+        return {
+            "accepted": False,
+            "decision": "rejected",
+            "person": None,
+            "desired_action": desired_action,
+            "reason": capture_error,
+        }
+
+    payload = {
+        "desired_action": desired_action,
+        "frame_jpeg_base64": frame_base64,
+    }
+    request = Request(
+        f"{DEEPFACE_URL}/auth/authorize",
+        method="POST",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=20) as response:
+            data = _decode_response_payload(response.read())
+            if isinstance(data, dict):
+                return data
+            return {
+                "accepted": False,
+                "decision": "rejected",
+                "person": None,
+                "desired_action": desired_action,
+                "reason": "auth_response_invalid",
+            }
+    except HTTPError as err:
+        payload = _decode_response_payload(err.read())
+        if isinstance(payload, dict):
+            detail = payload.get("detail")
+            return {
+                "accepted": bool(payload.get("accepted", False)),
+                "decision": str(payload.get("decision", "rejected")),
+                "person": payload.get("person"),
+                "desired_action": desired_action,
+                "reason": str(payload.get("reason") or detail or f"auth_http_{err.code}"),
+            }
+        return {
+            "accepted": False,
+            "decision": "rejected",
+            "person": None,
+            "desired_action": desired_action,
+            "reason": f"auth_http_{err.code}",
+        }
+    except URLError:
+        return {
+            "accepted": False,
+            "decision": "rejected",
+            "person": None,
+            "desired_action": desired_action,
+            "reason": "auth_service_unreachable",
+        }
 
 
 def build_system_prompt():
@@ -724,10 +846,30 @@ def execute_tool_call(tool_call):
         if not isinstance(state, dict) or not state:
             return {"status": 400, "data": {"error": "missing state"}}
         prev_status, prev_data = forward_request("GET", f"/api/devices/{device_id}")
+        if prev_status != 200 or not isinstance(prev_data, dict):
+            return {"status": prev_status, "data": prev_data}
+
+        auth_result = None
+        if AUTH_ENABLED:
+            protected_action = determine_protected_action(prev_data, state)
+            if protected_action:
+                auth_result = authorize_sensitive_action(protected_action)
+                if not auth_result.get("accepted"):
+                    return {
+                        "status": 403,
+                        "data": {
+                            "error": f"authorization rejected for {protected_action}",
+                            "auth": auth_result,
+                        },
+                        "previous": prev_data,
+                    }
+
         status, data = forward_request("PUT", f"/api/devices/{device_id}", {"state": state})
         result = {"status": status, "data": data}
         if prev_status == 200:
             result["previous"] = prev_data
+        if auth_result:
+            result["auth"] = auth_result
         return result
     return {"status": 400, "data": {"error": "unsupported action"}}
 
@@ -832,10 +974,15 @@ class Handler(BaseHTTPRequestHandler):
             ):
                 tool_error = extract_tool_error(tool_result)
                 if tool_error:
-                    response_text = (
-                        "I couldn't determine the device or state. "
-                        "Try specifying the exact device, like \"Kitchen Lights\"."
-                    )
+                    if "authorization rejected" in tool_error:
+                        response_text = (
+                            "Authentication failed. This action is protected and was rejected."
+                        )
+                    else:
+                        response_text = (
+                            "I couldn't determine the device or state. "
+                            "Try specifying the exact device, like \"Kitchen Lights\"."
+                        )
                 else:
                     response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
@@ -854,28 +1001,12 @@ class Handler(BaseHTTPRequestHandler):
             return
         action = payload.get("action")
         print(f"[tool] action={action} payload={payload}")
-        if action == "list":
-            status, data = forward_request("GET", "/api/devices")
-            write_json(self, status, data)
-            return
-        if action == "get":
-            device_id = payload.get("id")
-            if not device_id:
-                write_json(self, 400, {"error": "missing id"})
-                return
-            status, data = forward_request("GET", f"/api/devices/{device_id}")
-            write_json(self, status, data)
-            return
-        if action == "update":
-            device_id = payload.get("id")
-            state = payload.get("state")
-            if not device_id:
-                write_json(self, 400, {"error": "missing id"})
-                return
-            if not isinstance(state, dict) or not state:
-                write_json(self, 400, {"error": "missing state"})
-                return
-            status, data = forward_request("PUT", f"/api/devices/{device_id}", {"state": state})
+        if action in {"list", "get", "update"}:
+            result = execute_tool_call(payload)
+            status = result.get("status", 500)
+            data = result.get("data", {"error": "tool execution failed"})
+            if isinstance(data, dict) and result.get("auth") is not None:
+                data = {**data, "auth": result["auth"]}
             write_json(self, status, data)
             return
         write_json(self, 400, {"error": "unsupported action"})

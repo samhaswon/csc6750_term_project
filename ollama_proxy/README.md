@@ -30,8 +30,18 @@ Prompt test example:
 ## Notes
 
 - The proxy forwards to `VSHOME_URL` (default `http://vshome:8080`).
+- The proxy can call `DEEPFACE_URL` (default `http://deepface_service:8120`) for protected actions.
 - The test dashboard is served at `http://localhost:8090/`.
 - Health check: `GET /health`.
+
+## Protected Actions
+
+When `AUTH_ENABLED=true` (default), update requests are authenticated with a webcam frame before
+state writes for:
+
+- unlocking doors (`lock` device with `locked=false`)
+- opening doors (`doors` device with `open=true`)
+- setting thermostat values (`thermostat` with `temperature`)
 
 ## Tool-Call Evaluation Harness
 

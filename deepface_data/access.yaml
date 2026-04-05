@@ -1,0 +1,6 @@
+people:
+  samuel:
+    actions:
+      - unlock_door
+      - open_garage
+      - set_thermostat
