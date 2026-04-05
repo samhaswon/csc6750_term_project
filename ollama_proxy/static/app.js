@@ -18,6 +18,8 @@ let wakeCommandTimeoutMs = DEFAULT_COMMAND_TIMEOUT_MS;
 let awaitingCommandUntil = 0;
 let lastProcessedFinal = '';
 let lastProcessedAt = 0;
+let currentSpeechAudio = null;
+let currentSpeechUrl = null;
 
 const MESSAGES = [
   'Accomplishing',
@@ -94,6 +96,42 @@ const addCard = (title, content) => {
   card.appendChild(meta);
   card.appendChild(body);
   cards.prepend(card);
+};
+
+const stopCurrentSpeech = () => {
+  if (currentSpeechAudio) {
+    currentSpeechAudio.pause();
+    currentSpeechAudio = null;
+  }
+  if (currentSpeechUrl) {
+    URL.revokeObjectURL(currentSpeechUrl);
+    currentSpeechUrl = null;
+  }
+};
+
+const speakResponse = async (text) => {
+  const spokenText = String(text || '').trim();
+  if (!spokenText) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: spokenText })
+    });
+    if (!response.ok) {
+      return;
+    }
+    const audioBlob = await response.blob();
+    stopCurrentSpeech();
+    currentSpeechUrl = URL.createObjectURL(audioBlob);
+    currentSpeechAudio = new Audio(currentSpeechUrl);
+    await currentSpeechAudio.play();
+  } catch (_error) {
+    // Browser autoplay or transient network failure; keep UI responsive.
+  }
 };
 
 const setWakeUiState = (mode) => {
@@ -319,6 +357,7 @@ const runPrompt = async (overridePrompt = null) => {
       addCard('Error', payload.error || 'Request failed');
     } else {
       addCard('Response', payload.response || '');
+      await speakResponse(payload.response || '');
       if (payload.tool_call) {
         addCard('Tool Call', JSON.stringify(payload.tool_call, null, 2));
       }

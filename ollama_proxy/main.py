@@ -8,6 +8,7 @@ from urllib.request import Request, urlopen
 
 VSHOME_URL = os.environ.get("VSHOME_URL", "http://vshome:8080").rstrip("/")
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://ollama:11434").rstrip("/")
+KITTEN_TTS_URL = os.environ.get("KITTEN_TTS_URL", "http://kitten_tts_service:8110").rstrip("/")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "functiongemma:latest").strip()
 SYSTEM_PROMPT = os.environ.get(
     "SYSTEM_PROMPT",
@@ -110,6 +111,7 @@ def parse_positive_int(raw_value, default_value):
 
 WAKE_WORDS = parse_wake_words(os.environ.get("WAKE_WORDS", DEFAULT_WAKE_WORDS))
 WAKE_COMMAND_TIMEOUT_MS = parse_positive_int(os.environ.get("WAKE_COMMAND_TIMEOUT_MS"), 8000)
+OLLAMA_CONTEXT_SIZE = parse_positive_int(os.environ.get("OLLAMA_CONTEXT_SIZE"), 8192)
 
 
 def _decode_response_payload(raw_payload):
@@ -161,6 +163,14 @@ def write_json(handler, status, payload):
     handler.wfile.write(response)
 
 
+def write_bytes(handler, status, payload, content_type="application/octet-stream"):
+    handler.send_response(status)
+    handler.send_header("Content-Type", content_type)
+    handler.send_header("Content-Length", str(len(payload)))
+    handler.end_headers()
+    handler.wfile.write(payload)
+
+
 def forward_request(method, path, body=None):
     url = f"{VSHOME_URL}{path}"
     data = None
@@ -174,6 +184,33 @@ def forward_request(method, path, body=None):
             return response.getcode(), _decode_response_payload(response.read())
     except HTTPError as err:
         return err.code, _decode_response_payload(err.read())
+
+
+def synthesize_speech(text, voice=None, speed=None):
+    payload = {
+        "input": text,
+        "response_format": "wav",
+    }
+    if isinstance(voice, str) and voice.strip():
+        payload["voice"] = voice.strip()
+    if isinstance(speed, (int, float)):
+        payload["speed"] = float(speed)
+
+    request = Request(
+        f"{KITTEN_TTS_URL}/v1/audio/speech",
+        method="POST",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=30) as response:
+            content_type = response.headers.get("Content-Type", "audio/wav")
+            return response.getcode(), response.read(), content_type, None
+    except HTTPError as err:
+        error_payload = _decode_response_payload(err.read())
+        return err.code, b"", "application/json", error_payload
+    except URLError:
+        return 503, b"", "application/json", {"error": "kitten_tts_service_unreachable"}
 
 
 def _to_bool(value):
@@ -371,6 +408,7 @@ def call_ollama(prompt, tool_result=None, model=None):
         "model": model_name,
         "prompt": build_full_prompt(prompt, tool_result),
         "stream": False,
+        "options": {"num_ctx": OLLAMA_CONTEXT_SIZE},
     }
     request = Request(
         f"{OLLAMA_URL}/api/generate",
@@ -940,6 +978,25 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def do_POST(self):
+        if self.path == "/api/speak":
+            payload, error = read_json(self)
+            if error or payload is None:
+                write_json(self, 400, {"error": error})
+                return
+            text = str(payload.get("text", "")).strip()
+            voice = payload.get("voice")
+            speed = payload.get("speed")
+            if not text:
+                write_json(self, 400, {"error": "missing text"})
+                return
+            status, audio_data, content_type, err_payload = synthesize_speech(
+                text=text, voice=voice, speed=speed
+            )
+            if status != 200:
+                write_json(self, status, err_payload or {"error": "tts synthesis failed"})
+                return
+            write_bytes(self, 200, audio_data, content_type=content_type)
+            return
         if self.path == "/api/generate":
             payload, error = read_json(self)
             if error or payload is None:

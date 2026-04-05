@@ -10,7 +10,9 @@ cd vshome
 go run .
 ```
 
-Open `http://localhost:8080`.
+Open [`http://localhost:8080`](http://localhost:8080).
+
+For the console, start the docker stack and open [`http://localhost:8090/`](http://localhost:8090/)
 
 ## Device configuration
 

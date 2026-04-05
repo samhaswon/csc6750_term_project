@@ -8,6 +8,7 @@ Small HTTP proxy that translates tool calls into REST calls for the virtual smar
 
 - `POST /tools/smart_home`
 - `POST /api/generate`
+- `POST /api/speak`
 
 Request body examples:
 
@@ -33,9 +34,11 @@ Prompt test example:
 
 - The proxy forwards to `VSHOME_URL` (default `http://vshome:8080`).
 - The proxy can call `DEEPFACE_URL` (default `http://deepface_service:8120`) for protected actions.
+- The proxy can call `KITTEN_TTS_URL` (default `http://kitten_tts_service:8110`) for speech.
 - The test dashboard is served at `http://localhost:8090/`.
 - Health check: `GET /health`.
 - Wake word config endpoint: `GET /api/wake_word_config`.
+- Ollama context size override: `OLLAMA_CONTEXT_SIZE` (default `8192`) via `options.num_ctx`.
 
 ## Wake Word
 
