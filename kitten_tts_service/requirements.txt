@@ -1,4 +1,7 @@
 fastapi>=0.115,<1.0
+huggingface_hub>=0.24,<1.0
+misaki>=0.8,<1.0
+num2words>=0.5.13,<1.0
 numpy>=1.26,<3.0
 onnxruntime-gpu>=1.22,<2.0
 pydantic>=2.8,<3.0

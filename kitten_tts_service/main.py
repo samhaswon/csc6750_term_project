@@ -26,6 +26,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
+LOGGER = logging.getLogger(__name__)
 
 
 class SpeechRequest(BaseModel):
@@ -86,7 +87,17 @@ async def create_speech(payload: SpeechRequest) -> Response:
         speed=speed,
         response_format=response_format,
     )
-    cached_audio = CACHE.get(cache_key)
+    try:
+        cached_audio = CACHE.get(cache_key)
+    except Exception as exc:
+        LOGGER.exception(
+            "KittenTTS cache read failed model=%s voice=%s speed=%.2f chars=%d",
+            configured_model,
+            voice,
+            speed,
+            len(input_text),
+        )
+        raise HTTPException(status_code=500, detail=f"Cache read failed: {exc}") from exc
     if cached_audio is not None:
         return Response(
             content=cached_audio.audio_data,
@@ -111,8 +122,22 @@ async def create_speech(payload: SpeechRequest) -> Response:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
+        LOGGER.exception(
+            "KittenTTS runtime error model=%s voice=%s speed=%.2f chars=%d",
+            configured_model,
+            voice,
+            speed,
+            len(input_text),
+        )
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
+        LOGGER.exception(
+            "KittenTTS generation failed model=%s voice=%s speed=%.2f chars=%d",
+            configured_model,
+            voice,
+            speed,
+            len(input_text),
+        )
         raise HTTPException(status_code=500, detail=f"Speech generation failed: {exc}") from exc
 
     return Response(

@@ -25,7 +25,7 @@ WORKDIR /srv
 COPY requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install -r /tmp/requirements.txt \
-    && python -m pip install --no-deps \
+    && python -m pip install \
         https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
 
 COPY . /srv/kitten_tts_service

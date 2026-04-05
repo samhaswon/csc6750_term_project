@@ -49,8 +49,11 @@ services:
       - VSHOME_URL=http://vshome:8080
       - OLLAMA_URL=http://ollama:11434
       - DEEPFACE_URL=http://deepface_service:8120
+      - KITTEN_TTS_URL=http://kitten_tts_service:8110
       # Model to use for Ollama
       - OLLAMA_MODEL=gemma4:e2b
+      # Context window size used in Ollama generate options.num_ctx
+      - OLLAMA_CONTEXT_SIZE=8192
       # Wake-word controls used by the web dashboard
       - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal
       - WAKE_COMMAND_TIMEOUT_MS=8000
@@ -59,6 +62,7 @@ services:
     depends_on:
       - vshome
       - deepface_service
+      - kitten_tts_service
     restart: unless-stopped
   whisper_service:
     container_name: whisper_service
@@ -91,7 +95,7 @@ services:
       - KITTEN_MODEL_DIR=/models/kitten_tts
       - KITTEN_CACHE_DB=/data/kitten_tts/cache.sqlite3
       - KITTEN_DEVICE=auto
-      - KITTEN_DEFAULT_VOICE=Bella
+      - KITTEN_DEFAULT_VOICE=Bruno
       - MAX_INPUT_CHARS=5000
     volumes:
       - kitten-model-data:/models/kitten_tts
