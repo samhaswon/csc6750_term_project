@@ -54,6 +54,8 @@ services:
       - OLLAMA_MODEL=gemma4:e2b
       # Context window size used in Ollama generate options.num_ctx
       - OLLAMA_CONTEXT_SIZE=8192
+      # Hide tool_call and tool_result from dashboard/API generate output
+      - HIDE_TOOL_CALL_RESULTS=true
       # Wake-word controls used by the web dashboard
       - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal
       - WAKE_COMMAND_TIMEOUT_MS=8000

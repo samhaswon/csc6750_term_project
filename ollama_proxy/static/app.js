@@ -15,6 +15,7 @@ let wakeEnabled = false;
 let wakeShouldRestart = false;
 let wakeWords = [...DEFAULT_WAKE_WORDS];
 let wakeCommandTimeoutMs = DEFAULT_COMMAND_TIMEOUT_MS;
+let showToolCallResults = true;
 let awaitingCommandUntil = 0;
 let lastProcessedFinal = '';
 let lastProcessedAt = 0;
@@ -358,10 +359,10 @@ const runPrompt = async (overridePrompt = null) => {
     } else {
       addCard('Response', payload.response || '');
       await speakResponse(payload.response || '');
-      if (payload.tool_call) {
+      if (showToolCallResults && payload.tool_call) {
         addCard('Tool Call', JSON.stringify(payload.tool_call, null, 2));
       }
-      if (payload.tool_result) {
+      if (showToolCallResults && payload.tool_result) {
         addCard('Tool Result', JSON.stringify(payload.tool_result, null, 2));
       }
     }
@@ -395,9 +396,13 @@ const loadWakeWordConfig = async () => {
     if (Number.isInteger(payload.command_timeout_ms) && payload.command_timeout_ms > 0) {
       wakeCommandTimeoutMs = payload.command_timeout_ms;
     }
+    if (typeof payload.show_tool_call_results === 'boolean') {
+      showToolCallResults = payload.show_tool_call_results;
+    }
   } catch (_error) {
     wakeWords = [...DEFAULT_WAKE_WORDS];
     wakeCommandTimeoutMs = DEFAULT_COMMAND_TIMEOUT_MS;
+    showToolCallResults = true;
   }
   updateWakeHint();
 };

@@ -39,6 +39,7 @@ Prompt test example:
 - Health check: `GET /health`.
 - Wake word config endpoint: `GET /api/wake_word_config`.
 - Ollama context size override: `OLLAMA_CONTEXT_SIZE` (default `8192`) via `options.num_ctx`.
+- Hide tool metadata in `/api/generate`: `HIDE_TOOL_CALL_RESULTS` (default `false`).
 
 ## Wake Word
 

@@ -109,9 +109,23 @@ def parse_positive_int(raw_value, default_value):
     return parsed if parsed > 0 else default_value
 
 
+def parse_bool(raw_value, default_value=False):
+    if isinstance(raw_value, bool):
+        return raw_value
+    if not isinstance(raw_value, str):
+        return default_value
+    normalized = raw_value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default_value
+
+
 WAKE_WORDS = parse_wake_words(os.environ.get("WAKE_WORDS", DEFAULT_WAKE_WORDS))
 WAKE_COMMAND_TIMEOUT_MS = parse_positive_int(os.environ.get("WAKE_COMMAND_TIMEOUT_MS"), 8000)
 OLLAMA_CONTEXT_SIZE = parse_positive_int(os.environ.get("OLLAMA_CONTEXT_SIZE"), 8192)
+HIDE_TOOL_CALL_RESULTS = parse_bool(os.environ.get("HIDE_TOOL_CALL_RESULTS"), False)
 
 
 def _decode_response_payload(raw_payload):
@@ -964,6 +978,7 @@ class Handler(BaseHTTPRequestHandler):
                     "wake_words": WAKE_WORDS,
                     "command_timeout_ms": WAKE_COMMAND_TIMEOUT_MS,
                     "speech_recognition_required": True,
+                    "show_tool_call_results": not HIDE_TOOL_CALL_RESULTS,
                 },
             )
             return
@@ -1034,9 +1049,9 @@ class Handler(BaseHTTPRequestHandler):
                         if status == 200:
                             response_text = strip_tool_calls(data.get("response", ""))
                             payload_out = {"response": response_text, "model": fallback_model}
-                            if tool_call:
+                            if tool_call and not HIDE_TOOL_CALL_RESULTS:
                                 payload_out["tool_call"] = tool_call
-                            if tool_result:
+                            if tool_result and not HIDE_TOOL_CALL_RESULTS:
                                 payload_out["tool_result"] = tool_result
                             write_json(self, 200, payload_out)
                             return
@@ -1075,9 +1090,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
-            if tool_call:
+            if tool_call and not HIDE_TOOL_CALL_RESULTS:
                 payload_out["tool_call"] = tool_call
-            if tool_result:
+            if tool_result and not HIDE_TOOL_CALL_RESULTS:
                 payload_out["tool_result"] = tool_result
             write_json(self, 200, payload_out)
             return
