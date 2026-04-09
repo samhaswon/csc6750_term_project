@@ -4,4 +4,4 @@ pydantic==2.10.3
 PyYAML==6.0.2
 deepface==0.0.93
 opencv-python-headless==4.10.0.84
-tf-keras
+tf-keras==2.16.0

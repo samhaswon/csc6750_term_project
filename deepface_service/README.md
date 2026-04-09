@@ -2,6 +2,12 @@
 
 Local face-recognition authorization service used by `ollama_proxy`.
 
+## GPU acceleration
+
+The service image is built on TensorFlow GPU runtime and expects an NVIDIA GPU host with
+NVIDIA Container Toolkit enabled. In Compose, `deepface_service` requests GPU devices via
+`gpus: all`.
+
 ## Data layout
 
 The service reads from `DEEPFACE_DATA_DIR` (default `/data/deepface`):

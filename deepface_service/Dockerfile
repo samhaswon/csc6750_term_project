@@ -1,8 +1,10 @@
-FROM python:3.11-slim
+FROM tensorflow/tensorflow:2.16.1-gpu
 
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 ENV PYTHONPATH=/srv
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH=/opt/venv/bin:$PATH
 ENV DEEPFACE_HOST=0.0.0.0
 ENV DEEPFACE_PORT=8120
 ENV DEEPFACE_DATA_DIR=/data/deepface
@@ -11,17 +13,22 @@ ENV DEEPFACE_LOG_FILE=/data/deepface/auth.log
 ENV DEEPFACE_MODEL_NAME=Facenet512
 ENV DEEPFACE_DETECTOR_BACKEND=opencv
 ENV DEEPFACE_ENFORCE_DETECTION=false
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV TF_FORCE_GPU_ALLOW_GROWTH=true
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libgl1 \
         libglib2.0-0 \
+        python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /srv
 
 COPY requirements.txt /tmp/requirements.txt
-RUN python -m pip install --upgrade pip setuptools wheel \
+RUN python -m venv --system-site-packages ${VIRTUAL_ENV} \
+    && python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install -r /tmp/requirements.txt
 
 COPY . /srv/deepface_service
