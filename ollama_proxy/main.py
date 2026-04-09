@@ -461,8 +461,11 @@ def call_ollama(prompt, tool_result=None, model=None):
             status = response.getcode()
             data = _as_object_payload(_decode_response_payload(response.read()))
             output = data.get("response", "")
+            input_tokens = data.get("prompt_eval_count", 0)
+            output_tokens = data.get("eval_count", 0)
             if output:
                 print(f"[ollama] response: {output}")
+                print(f"[ollama] tokens: total={input_tokens + output_tokens}, input={input_tokens}, output={output_tokens}")
             else:
                 print(f"[ollama] empty response payload: {data}")
             return status, data
@@ -1088,6 +1091,12 @@ class Handler(BaseHTTPRequestHandler):
                         if status == 200:
                             response_text = strip_tool_calls(data.get("response", ""))
                             payload_out = {"response": response_text, "model": fallback_model}
+                            prompt_eval_count = data.get("prompt_eval_count")
+                            eval_count = data.get("eval_count")
+                            if isinstance(prompt_eval_count, int):
+                                payload_out["prompt_eval_count"] = prompt_eval_count
+                            if isinstance(eval_count, int):
+                                payload_out["eval_count"] = eval_count
                             if tool_call and show_tool_details:
                                 payload_out["tool_call"] = tool_call
                             if tool_result and show_tool_details:
@@ -1129,6 +1138,12 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     response_text = format_user_confirmation(tool_call, tool_result)
             payload_out = {"response": response_text}
+            prompt_eval_count = data.get("prompt_eval_count")
+            eval_count = data.get("eval_count")
+            if isinstance(prompt_eval_count, int):
+                payload_out["prompt_eval_count"] = prompt_eval_count
+            if isinstance(eval_count, int):
+                payload_out["eval_count"] = eval_count
             if tool_call and show_tool_details:
                 payload_out["tool_call"] = tool_call
             if tool_result and show_tool_details:

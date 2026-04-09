@@ -37,6 +37,13 @@ services:
     ports:
       - "8120:8120"
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   ollama_proxy:
     container_name: ollama_proxy
     build:
