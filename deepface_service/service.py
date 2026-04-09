@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import datetime as dt
+from deepface import DeepFace
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -114,11 +115,6 @@ class DeepFaceAuthService:
         people_dir = self._settings.data_dir / "people"
         if not people_dir.exists():
             return None, "people_directory_missing"
-
-        try:
-            from deepface import DeepFace
-        except Exception:
-            return None, "deepface_unavailable"
 
         image_path: Path | None = None
         try:
