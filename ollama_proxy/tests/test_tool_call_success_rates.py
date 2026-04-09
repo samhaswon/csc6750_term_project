@@ -13,15 +13,18 @@ from urllib.request import Request, urlopen
 """
 Last results:
 
-model                | passed | total | success_rate
-gemma3n:e2b          | 18     | 23    | 78.3%
-gemma4:e2b           | 21     | 23    | 91.3%
-qwen3:1.7b           | 17     | 23    | 73.9%
-qwen3:0.6b           | 13     | 23    | 56.5%
-qwen3.5:0.8b         |  3     | 23    | 13.0%
-qwen3.5:2b           |  8     | 23    | 34.8%
-functiongemma:latest |  0     | 23    |  0.0%
-llama3.2:1b          |  9     | 23    | 39.1%
+model                          | passed | total | success_rate
+gemma3n:e2b                    | 18     | 23    | 78.3%
+gemma4:e2b                     | 21     | 23    | 91.3%
+qwen3:1.7b                     | 17     | 23    | 73.9%
+qwen3:0.6b                     | 13     | 23    | 56.5%
+qwen3.5:0.8b                   |  3     | 23    | 13.0%
+qwen3.5:2b                     |  8     | 23    | 34.8%
+functiongemma:latest           |  0     | 23    |  0.0%
+llama3.2:1b                    |  9     | 23    | 39.1%
+gemma4:26b-a4b-it-q4_K_M       | 20     | 23    | 87.0%
+gemma4:e4b-it-q4_K_M           | 21     | 23    | 91.3%
+nemotron-3-nano:30b-a3b-q4_K_M |  4     | 23    | 17.4%
 
 3912.932s (1hr, 5 minutes, 12 seconds) total runtime
 (using both GPUs)
@@ -38,6 +41,9 @@ DEFAULT_MODELS = [
     "qwen3.5:2b",
     "functiongemma:latest",
     "llama3.2:1b",
+    # "gemma4:26b-a4b-it-q4_K_M",
+    # "gemma4:e4b-it-q4_K_M",
+    # "nemotron-3-nano:30b-a3b-q4_K_M",
 ]
 
 TEST_CASES = [
