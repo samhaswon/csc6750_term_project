@@ -361,7 +361,7 @@ def build_system_prompt():
     return "\n".join(lines)
 
 
-def build_full_prompt(user_prompt, tool_result=None):
+def build_full_prompt(user_prompt, tool_result=None, summarize_action=False):
     prompt_parts = [build_system_prompt(), "", f"User: {user_prompt}"]
     if tool_result is not None:
         prompt_parts.extend(
@@ -369,6 +369,13 @@ def build_full_prompt(user_prompt, tool_result=None):
                 "",
                 "Tool result:",
                 json.dumps(tool_result),
+            ]
+        )
+    if summarize_action:
+        prompt_parts.extend(
+            [
+                "",
+                "Summarize the action you just completed using the tool result above.",
             ]
         )
     prompt_parts.append("Assistant:")
@@ -442,11 +449,15 @@ def unload_ollama_model(model):
         return err.code, _decode_response_payload(err.read())
 
 
-def call_ollama(prompt, tool_result=None, model=None):
+def call_ollama(prompt, tool_result=None, model=None, summarize_action=False):
     model_name = model or OLLAMA_MODEL
     payload = {
         "model": model_name,
-        "prompt": build_full_prompt(prompt, tool_result),
+        "prompt": build_full_prompt(
+            prompt,
+            tool_result=tool_result,
+            summarize_action=summarize_action,
+        ),
         "stream": False,
         "options": {"num_ctx": OLLAMA_CONTEXT_SIZE},
     }
@@ -490,7 +501,12 @@ def run_with_tool_loop(prompt, max_steps=2, model=None):
     for _ in range(max_steps):
         print(f"[tool] model_call={tool_call}")
         tool_result = execute_tool_call(tool_call)
-        status, data = call_ollama(prompt, tool_result=tool_result, model=model)
+        status, data = call_ollama(
+            prompt,
+            tool_result=tool_result,
+            model=model,
+            summarize_action=True,
+        )
         if status != 200:
             return status, data, tool_call, tool_result
         response_text = data.get("response", "")
@@ -964,12 +980,14 @@ def execute_tool_call(tool_call):
                             "auth": auth_result,
                         },
                         "previous": prev_data,
+                        "prior_state": prev_data.get("state", {}),
                     }
 
         status, data = forward_request("PUT", f"/api/devices/{device_id}", {"state": state})
         result = {"status": status, "data": data}
         if prev_status == 200:
             result["previous"] = prev_data
+            result["prior_state"] = prev_data.get("state", {})
         if auth_result:
             result["auth"] = auth_result
         return result
