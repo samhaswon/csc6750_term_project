@@ -144,7 +144,7 @@ class DeepFaceAuthService:
                 image_path.unlink(missing_ok=True)
 
     def _append_auth_log(
-            self, person: str | None, desired_action: str, decision: str
+        self, person: str | None, desired_action: str, decision: str
     ) -> None:
         """Append a structured auth decision line to the audit log.
 
