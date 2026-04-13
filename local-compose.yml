@@ -1,0 +1,60 @@
+services:
+  vshome:
+    container_name: vshome
+    build:
+      context: ./vshome
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+  ollama_proxy:
+    container_name: ollama_proxy
+    build:
+      context: ./ollama_proxy
+    devices:
+      - /dev/video0:/dev/video0
+    group_add:
+      - video
+    environment:
+      - VSHOME_URL=http://vshome:8080
+      - OLLAMA_URL=http://ollama:11434
+      - DEEPFACE_URL=http://deepface_service:8120
+      - KITTEN_TTS_URL=http://kitten_tts_service:8110
+      # Model to use for Ollama
+      - OLLAMA_MODEL=gemma4:e2b
+      # When false, do not remap requested model tags to other family sizes.
+      - OLLAMA_ALLOW_MODEL_FAMILY_FALLBACK=false
+      # Context window size used in Ollama generate options.num_ctx
+      - OLLAMA_CONTEXT_SIZE=4096
+      # Hide tool_call and tool_result from dashboard/API generate output
+      - HIDE_TOOL_CALL_RESULTS=true
+      # Wake-word controls used by the web dashboard
+      - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal
+      - WAKE_COMMAND_TIMEOUT_MS=8000
+    ports:
+      - "8090:8090"
+    depends_on:
+      - vshome
+      - deepface_service
+      - kitten_tts_service
+    restart: unless-stopped
+  kitten_tts_service:
+    container_name: kitten_tts_service
+    build:
+      context: ./kitten_tts_service
+    environment:
+      - KITTEN_MODEL=KittenML/kitten-tts-nano-0.8
+      - KITTEN_MODEL_DIR=/models/kitten_tts
+      - KITTEN_CACHE_DB=/data/kitten_tts/cache.sqlite3
+      - KITTEN_DEVICE=auto
+      - KITTEN_DEFAULT_VOICE=Bruno
+      - MAX_INPUT_CHARS=5000
+    volumes:
+      - kitten-model-data:/models/kitten_tts
+      - kitten-cache-data:/data/kitten_tts
+    ports:
+      - "8110:8110"
+    restart: unless-stopped
+
+volumes:
+  kitten-model-data:
+  kitten-cache-data:

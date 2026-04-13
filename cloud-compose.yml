@@ -1,0 +1,65 @@
+services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  deepface_service:
+    container_name: deepface_service
+    build:
+      context: ./deepface_service
+    environment:
+      - DEEPFACE_DATA_DIR=/data/deepface
+      - DEEPFACE_ACCESS_FILE=/data/deepface/access.yaml
+      - DEEPFACE_LOG_FILE=/data/deepface/auth.log
+      - DEEPFACE_MODEL_NAME=Facenet512
+      - DEEPFACE_DETECTOR_BACKEND=opencv
+      - DEEPFACE_ENFORCE_DETECTION=false
+    volumes:
+      - ./deepface_data:/data/deepface
+    ports:
+      - "8120:8120"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  whisper_service:
+    container_name: whisper_service
+    build:
+      context: ./whisper_service
+    environment:
+      # Common Whisper models: tiny, base, small, medium, large, turbo
+      - WHISPER_MODEL=tiny
+      - WHISPER_MODEL_DIR=/models/whisper
+      - WHISPER_DEVICE=auto
+      - MAX_UPLOAD_MB=50
+    volumes:
+      - whisper-model-data:/models/whisper
+    ports:
+      - "8100:8100"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  ollama-data:
+  whisper-model-data:
