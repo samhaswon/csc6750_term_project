@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 import datetime as dt
-from deepface import DeepFace
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -121,6 +120,8 @@ class DeepFaceAuthService:
             with NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
                 temp_file.write(frame_bytes)
                 image_path = Path(temp_file.name)
+
+            from deepface import DeepFace
 
             result = DeepFace.find(
                 img_path=str(image_path),
