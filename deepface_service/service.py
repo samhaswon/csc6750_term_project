@@ -56,7 +56,9 @@ class Settings:
             log_file=log_file,
             model_name=os.environ.get("DEEPFACE_MODEL_NAME", "Facenet512"),
             detector_backend=os.environ.get("DEEPFACE_DETECTOR_BACKEND", "opencv"),
-            enforce_detection=_parse_bool(os.environ.get("DEEPFACE_ENFORCE_DETECTION", "false")),
+            enforce_detection=_parse_bool(
+                os.environ.get("DEEPFACE_ENFORCE_DETECTION", "false")
+            ),
         )
 
 
@@ -141,7 +143,9 @@ class DeepFaceAuthService:
             if image_path is not None:
                 image_path.unlink(missing_ok=True)
 
-    def _append_auth_log(self, person: str | None, desired_action: str, decision: str) -> None:
+    def _append_auth_log(
+            self, person: str | None, desired_action: str, decision: str
+    ) -> None:
         """Append a structured auth decision line to the audit log.
 
         :param person: Recognized person name, if any.
