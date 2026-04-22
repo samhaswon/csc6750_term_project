@@ -1,0 +1,56 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: samhaswon/csc6750_term_project-deepface_service
+            context: ./deepface_service
+            dockerfile: ./deepface_service/Dockerfile
+            tag_suffix: latest
+          - image: samhaswon/csc6750_term_project-kitten_tts_service
+            context: ./kitten_tts_service
+            dockerfile: ./kitten_tts_service/Dockerfile
+            tag_suffix: latest
+          - image: samhaswon/csc6750_term_project-ollama_proxy
+            context: ./ollama_proxy
+            dockerfile: ./ollama_proxy/Dockerfile
+            tag_suffix: latest
+          - image: samhaswon/csc6750_term_project-vshome
+            context: ./vshome
+            dockerfile: ./vshome/Dockerfile
+            tag_suffix: latest
+          - image: samhaswon/csc6750_term_project-whisper_service
+            context: ./whisper_service
+            dockerfile: ./whisper_service/Dockerfile
+            tag_suffix: latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Build and push
+        run: |
+          docker buildx build --push \
+            --platform linux/arm64/v8,linux/amd64 \
+            --tag "${{ matrix.image }}:${{ matrix.tag_suffix }}" \
+            --file "${{ matrix.dockerfile }}" \
+            "${{ matrix.context }}"
