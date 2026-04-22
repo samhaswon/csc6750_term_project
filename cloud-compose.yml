@@ -16,8 +16,7 @@ services:
               capabilities: [gpu]
   deepface_service:
     container_name: deepface_service
-    build:
-      context: ./deepface_service
+    image: samhaswon/csc6750_term_project-deepface_service:latest
     environment:
       - DEEPFACE_DATA_DIR=/data/deepface
       - DEEPFACE_ACCESS_FILE=/data/deepface/access.yaml
@@ -39,8 +38,7 @@ services:
               capabilities: [gpu]
   whisper_service:
     container_name: whisper_service
-    build:
-      context: ./whisper_service
+    image: samhaswon/csc6750_term_project-whisper_service:latest
     environment:
       # Common Whisper models: tiny, base, small, medium, large, turbo
       - WHISPER_MODEL=tiny
