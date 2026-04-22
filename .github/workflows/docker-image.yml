@@ -20,22 +20,27 @@ jobs:
             context: ./deepface_service
             dockerfile: ./deepface_service/Dockerfile
             tag_suffix: latest
+            platform: linux/arm64/v8,linux/amd64
           - image: samhaswon/csc6750_term_project-kitten_tts_service
             context: ./kitten_tts_service
             dockerfile: ./kitten_tts_service/Dockerfile
             tag_suffix: latest
+            platform: linux/amd64
           - image: samhaswon/csc6750_term_project-ollama_proxy
             context: ./ollama_proxy
             dockerfile: ./ollama_proxy/Dockerfile
             tag_suffix: latest
+            platform: linux/arm64/v8,linux/amd64
           - image: samhaswon/csc6750_term_project-vshome
             context: ./vshome
             dockerfile: ./vshome/Dockerfile
             tag_suffix: latest
+            platform: linux/arm64/v8,linux/amd64
           - image: samhaswon/csc6750_term_project-whisper_service
             context: ./whisper_service
             dockerfile: ./whisper_service/Dockerfile
             tag_suffix: latest
+            platform: linux/arm64/v8,linux/amd64
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -50,7 +55,7 @@ jobs:
       - name: Build and push
         run: |
           docker buildx build --push \
-            --platform linux/arm64/v8,linux/amd64 \
+            --platform "${{ matrix.platform }}" \
             --tag "${{ matrix.image }}:${{ matrix.tag_suffix }}" \
             --file "${{ matrix.dockerfile }}" \
             "${{ matrix.context }}"
