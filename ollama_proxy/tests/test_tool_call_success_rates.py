@@ -14,8 +14,8 @@ from urllib.request import Request, urlopen
 Last results:
 
 model                          | passed | total | success_rate
-gemma3n:e2b                    | 18     | 23    | 78.3%
-gemma4:e2b                     | 21     | 23    | 91.3%
+gemma3n:e2b                    | 22     | 23    | 95.7%
+gemma4:e2b                     | 22     | 23    | 95.7%
 qwen3:1.7b                     | 17     | 23    | 73.9%
 qwen3:0.6b                     | 13     | 23    | 56.5%
 qwen3.5:0.8b                   |  3     | 23    | 13.0%

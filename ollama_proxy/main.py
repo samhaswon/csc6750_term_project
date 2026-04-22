@@ -1,8 +1,9 @@
 import base64
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import os
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+import re
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -14,72 +15,77 @@ SYSTEM_PROMPT = os.environ.get(
     "SYSTEM_PROMPT",
     (
         """
-        You have access to functions. If you decide to invoke any of the function(s),
-        you MUST put it in the format of:
-        [func_name(param_name=param_value, param_name2=param_value2), func_name2(param)]
-        You SHOULD NOT include any other text in the response if you call a function.
+You have access to functions. If you decide to invoke any of the function(s),
+you MUST put it in the format of:
+[func_name(param_name=param_value, param_name2=param_value2), func_name2(param)]
+You SHOULD NOT include any other text in the response if you call a function.
 
-        Available functions:
-        [
-          {
-            "name": "list_devices",
-            "description": "List all devices and their state, including id, room, kind, and state keys",
-            "parameters": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          {
-            "name": "get_device",
-            "description": "Fetch a device by id to read its current state before replying",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "string" }
-              },
-              "required": ["id"]
-            }
-          },
-          {
-            "name": "update_device_state",
-            "description": "Update a device state by id. Use state keys: on, locked, open, position, level, temperature.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "string" },
-                "state": { "type": "object" }
-              },
-              "required": ["id", "state"]
-            }
-          }
-        ]
+Available functions:
+[
+{
+"name": "list_devices",
+"description": "List all devices and their state, including id, room, kind, and state keys",
+"parameters": {
+    "type": "object",
+    "properties": {}
+}
+},
+{
+"name": "get_device",
+"description": "Fetch a device by id to read its current state before replying",
+"parameters": {
+    "type": "object",
+    "properties": {
+    "id": { "type": "string" }
+    },
+    "required": ["id"]
+}
+},
+{
+"name": "update_device_state",
+"description": "Update a device state by id. Use state keys: on, locked, open, position, level, temperature.",
+"parameters": {
+    "type": "object",
+    "properties": {
+    "id": { "type": "string" },
+    "state": { "type": "object" }
+    },
+    "required": ["id", "state"]
+}
+}
+]
 
-        How to use the tools:
-        - To turn a device on/off (lights, toaster, vacuum), call update_device_state with state.on true/false.
-        - To lock/unlock, use state.locked true/false.
-        - To open/close doors, use state.open true/false.
-        - To adjust blinds, set state.position 0-100.
-        - To set humidifier, set state.level 0-100.
-        - To set thermostat, set state.temperature in Celsius.
+How to use the tools:
+- To turn a device on/off (lights, toaster, vacuum), call update_device_state with state.on true/false.
+- To lock/unlock, use state.locked true/false.
+- To open/close doors, use state.open true/false.
+- To adjust blinds, set state.position 0-100.
+- To set humidifier, set state.level 0-100.
+- To set thermostat, set state.temperature in Celsius.
 
-        Examples:
-        - Turn on kitchen lights:
-          [update_device_state(id="light_kitchen", state={"on": true})]
-        - Turn off kitchen lights:
-          [update_device_state(id="light_kitchen", state={"on": false})]
-        - Lock the front door:
-          [update_device_state(id="door_front_lock", state={"locked": true})]
-        - Set living room blinds to 50%:
-          [update_device_state(id="blinds_living", state={"position": 50})]
-        - Read current thermostat:
-          [get_device(id="thermostat_home")]
+Examples:
+- Turn on kitchen lights:
+    [update_device_state(id="light_kitchen", state={"on": true})]
+- Turn off kitchen lights:
+    [update_device_state(id="light_kitchen", state={"on": false})]
+- Lock the front door:
+    [update_device_state(id="door_front_lock", state={"locked": true})]
+- Set living room blinds to 50%:
+    [update_device_state(id="blinds_living", state={"position": 50})]
+- Read current thermostat:
+    [get_device(id="thermostat_home")]
 
-        After a tool call completes that changes state, respond with a short user-facing confirmation.
-        If the requested state was already set, say it was already in that state.
-        If a user is inquiring about state, respond with the current state of the device.
-        """
+After a tool call completes that changes state, respond with a short user-facing confirmation.
+If the requested state was already set, say it was already in that state.
+If a user asks about state, respond with the current state of the device.
+""".strip()
     ),
 )
+
+SYSTEM_PROMPT = re.sub(r"\n\n+", "\n", SYSTEM_PROMPT, re.MULTILINE)
+SYSTEM_PROMPT = re.sub(r"(?<=:)\s?\n\s+|(?<={)\n\s+|(?<=,)\n\s+", " ", SYSTEM_PROMPT)
+SYSTEM_PROMPT = re.sub(r"(?<=[\w.])\n|(?<=[\[\{,\}])[\n ]+", " ", SYSTEM_PROMPT)
+
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 DEEPFACE_URL = os.environ.get("DEEPFACE_URL", "http://deepface_service:8120").rstrip("/")
 CAMERA_INDEX = int(os.environ.get("CAMERA_INDEX", "0"))
@@ -357,7 +363,6 @@ def build_system_prompt():
             f"- {name} (id: {device_id}, kind: {kind}, room: {room}, state: {state})"
         )
     lines.append("")
-    # lines.append("Respond ONLY with a tool call when acting.")
     return "\n".join(lines)
 
 
