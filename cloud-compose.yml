@@ -7,13 +7,6 @@ services:
     ports:
       - "11434:11434"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
   deepface_service:
     container_name: deepface_service
     image: samhaswon/csc6750_term_project-deepface_service:latest
@@ -29,13 +22,6 @@ services:
     ports:
       - "8120:8120"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
   whisper_service:
     container_name: whisper_service
     image: samhaswon/csc6750_term_project-whisper_service:latest
@@ -50,13 +36,6 @@ services:
     ports:
       - "8100:8100"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
 
 volumes:
   ollama-data:
