@@ -2,7 +2,7 @@ fastapi==0.115.5
 uvicorn==0.32.1
 pydantic==2.10.3
 PyYAML==6.0.2
-deepface==0.0.93
+deepface==0.0.99
 opencv-python-headless==4.10.0.84
 tf-keras==2.16.0
 mysql-connector-python==9.1.0
