@@ -7,13 +7,25 @@ services:
     ports:
       - "11434:11434"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  mysql:
+    container_name: deepface_mysql
+    image: mysql:8.4
+    environment:
+      - MYSQL_DATABASE=deepface
+      - MYSQL_USER=deepface
+      - MYSQL_PASSWORD=deepface_password
+      - MYSQL_ROOT_PASSWORD=deepface_root_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pdeepface_root_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
   deepface_service:
     container_name: deepface_service
     image: samhaswon/csc6750_term_project-deepface_service:latest
@@ -24,18 +36,19 @@ services:
       - DEEPFACE_MODEL_NAME=Facenet512
       - DEEPFACE_DETECTOR_BACKEND=opencv
       - DEEPFACE_ENFORCE_DETECTION=false
+      - DEEPFACE_MYSQL_HOST=mysql
+      - DEEPFACE_MYSQL_PORT=3306
+      - DEEPFACE_MYSQL_DATABASE=deepface
+      - DEEPFACE_MYSQL_USER=deepface
+      - DEEPFACE_MYSQL_PASSWORD=deepface_password
     volumes:
       - ./deepface_data:/data/deepface
     ports:
       - "8120:8120"
+    depends_on:
+      mysql:
+        condition: service_healthy
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
   whisper_service:
     container_name: whisper_service
     image: samhaswon/csc6750_term_project-whisper_service:latest
@@ -50,14 +63,8 @@ services:
     ports:
       - "8100:8100"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
 
 volumes:
   ollama-data:
+  mysql-data:
   whisper-model-data:

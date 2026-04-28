@@ -21,6 +21,25 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+  mysql:
+    container_name: deepface_mysql
+    image: mysql:8.4
+    environment:
+      - MYSQL_DATABASE=deepface
+      - MYSQL_USER=deepface
+      - MYSQL_PASSWORD=deepface_password
+      - MYSQL_ROOT_PASSWORD=deepface_root_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pdeepface_root_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
   deepface_service:
     container_name: deepface_service
     build:
@@ -32,10 +51,18 @@ services:
       - DEEPFACE_MODEL_NAME=Facenet512
       - DEEPFACE_DETECTOR_BACKEND=opencv
       - DEEPFACE_ENFORCE_DETECTION=false
+      - DEEPFACE_MYSQL_HOST=mysql
+      - DEEPFACE_MYSQL_PORT=3306
+      - DEEPFACE_MYSQL_DATABASE=deepface
+      - DEEPFACE_MYSQL_USER=deepface
+      - DEEPFACE_MYSQL_PASSWORD=deepface_password
     volumes:
       - ./deepface_data:/data/deepface
     ports:
       - "8120:8120"
+    depends_on:
+      mysql:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
@@ -57,6 +84,7 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - DEEPFACE_URL=http://deepface_service:8120
       - KITTEN_TTS_URL=http://kitten_tts_service:8110
+      - DEEPFACE_AUTH_KEY=a2ecd759be6bd340af29413cc7808f40f5884d2746ddba04d97c4b9fbe0a76ab
       # Model to use for Ollama
       - OLLAMA_MODEL=gemma4:e2b
       # When false, do not remap requested model tags to other family sizes.
@@ -66,7 +94,7 @@ services:
       # Hide tool_call and tool_result from dashboard/API generate output
       - HIDE_TOOL_CALL_RESULTS=true
       # Wake-word controls used by the web dashboard
-      - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal
+      - WAKE_WORDS=hey home,ok home,hey Hal,ok Hal,computer
       - WAKE_COMMAND_TIMEOUT_MS=8000
     ports:
       - "8090:8090"
@@ -117,6 +145,7 @@ services:
 
 volumes:
   ollama-data:
+  mysql-data:
   whisper-model-data:
   kitten-model-data:
   kitten-cache-data:

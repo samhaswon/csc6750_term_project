@@ -88,6 +88,7 @@ SYSTEM_PROMPT = re.sub(r"(?<=[\w.])\n|(?<=[\[\{,\}])[\n ]+", " ", SYSTEM_PROMPT)
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 DEEPFACE_URL = os.environ.get("DEEPFACE_URL", "http://deepface_service:8120").rstrip("/")
+DEEPFACE_AUTH_KEY = os.environ.get("DEEPFACE_AUTH_KEY", "").strip()
 CAMERA_INDEX = int(os.environ.get("CAMERA_INDEX", "0"))
 CAMERA_CAPTURE_ATTEMPTS = int(os.environ.get("CAMERA_CAPTURE_ATTEMPTS", "3"))
 AUTH_ENABLED = os.environ.get("AUTH_ENABLED", "true").strip().lower() in (
@@ -302,6 +303,8 @@ def authorize_sensitive_action(desired_action):
         "desired_action": desired_action,
         "frame_jpeg_base64": frame_base64,
     }
+    if DEEPFACE_AUTH_KEY:
+        payload["auth_key"] = DEEPFACE_AUTH_KEY
     request = Request(
         f"{DEEPFACE_URL}/auth/authorize",
         method="POST",

@@ -35,6 +35,7 @@ Prompt test example:
 
 - The proxy forwards to `VSHOME_URL` (default `http://vshome:8080`).
 - The proxy can call `DEEPFACE_URL` (default `http://deepface_service:8120`) for protected actions.
+- The proxy includes `DEEPFACE_AUTH_KEY` in deepface auth requests when configured.
 - The proxy can call `KITTEN_TTS_URL` (default `http://kitten_tts_service:8110`) for speech.
 - The test dashboard is served at `http://localhost:8090/`.
 - Health check: `GET /health`.
