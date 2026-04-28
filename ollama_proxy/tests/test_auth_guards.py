@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from urllib.error import HTTPError
+import json
 
 from ollama_proxy.main import (
     authorize_sensitive_action,
@@ -74,6 +75,35 @@ class AuthGuardTests(unittest.TestCase):
 
         self.assertEqual(result["status"], 200)
         self.assertEqual(result["auth"]["person"], "alice")
+
+    @patch("ollama_proxy.main.capture_webcam_frame_base64")
+    @patch("ollama_proxy.main.DEEPFACE_AUTH_KEY", "test-key")
+    @patch("ollama_proxy.main.urlopen")
+    def test_authorize_sensitive_action_includes_auth_key(
+        self,
+        mock_urlopen,
+        mock_capture,
+    ):
+        class StubResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self):
+                return b'{"accepted": true, "decision": "accepted", "person": "default"}'
+
+        mock_capture.return_value = ("ZmFrZS1mcmFtZQ==", None)
+        mock_urlopen.return_value = StubResponse()
+
+        authorize_sensitive_action("unlock_door")
+
+        request = mock_urlopen.call_args.args[0]
+        payload = json.loads(request.data.decode("utf-8"))
+        self.assertEqual(payload["auth_key"], "test-key")
+        self.assertEqual(payload["desired_action"], "unlock_door")
+        self.assertIn("frame_jpeg_base64", payload)
 
     @patch("ollama_proxy.main.capture_webcam_frame_base64")
     @patch("ollama_proxy.main.urlopen")
